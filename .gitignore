@@ -1,0 +1,9 @@
+.Rproj.user
+.Rhistory
+.RData
+notes.md
+.DS_Store
+revdep/checks.noindex
+revdep/data.sqlite
+revdep/library.noindex
+notes.R
