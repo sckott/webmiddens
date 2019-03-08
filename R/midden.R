@@ -7,8 +7,12 @@
 #'     \item{`init(path)`}{
 #'       a directory path
 #'     }
-#'     \item{`call(...)`}{
+#'     \item{`call(..., expire = NULL)`}{
 #'       an http request code block
+#'       - ...: a http request block
+#'       - expire: (integer) number of seconds until expiry. after this time, 
+#'         we force a real HTTP reqeuest even if a matching stub exists.
+#'         times are recorded in UTC.
 #'     }
 #'   }
 #' @format NULL
@@ -25,11 +29,27 @@
 #' x
 #' x$init(path = "rainforest")
 #' x
+#' # first request is a real HTTP request
+#' x$call(con$get("get", query = list(stuff = "bananas")))
+#' # following requests use the cached response
 #' x$call(con$get("get", query = list(stuff = "bananas")))
 #' 
+#' # verbose output
 #' x <- midden$new(verbose = TRUE)
 #' x$init(path = "rainforest")
 #' x$call(con$get("get", query = list(stuff = "bananas")))
+#' 
+#' # set expiration time
+#' x <- midden$new()
+#' x$init(path = "grass")
+#' x
+#' # set expiry
+#' x$call(con$get("get", query = list(grass = "tall")), expire = 10)
+#' ## before expiry, get mocked response
+#' x$call(con$get("get", query = list(grass = "tall")), expire = 10)
+#' Sys.sleep(10)
+#' ## after expiry, get real response
+#' x$call(con$get("get", query = list(grass = "tall")), expire = 10)
 #' }
 midden <- R6::R6Class(
   'midden',
@@ -37,23 +57,29 @@ midden <- R6::R6Class(
     cache = NULL,
     cache_path = NULL,
     verbose = FALSE,
+    expiry = NULL,
 
     initialize = function(verbose = FALSE) self$verbose <- verbose,
     print = function(x, ...) {
       cat("<midden> ", sep = "\n")
       cat(paste0("  path: ", self$cache_path), sep = "\n")
     },
-    call = function(...) {
+    call = function(..., expire = NULL) {
       if (is.null(self$cache)) stop("run $init first")
       if (!dir.exists(self$cache$cache_path_get())) self$cache$mkdir()
       private$webmock_init()
       private$load_stubs()
       res <- force(...)
       stub <- private$make_stub(res$method, res$url, res$content)
-      if (!private$in_stored_stubs(stub)) private$cache_stub(stub)
-      on.exit(private$m(webmockr::webmockr_disable_net_connect()),
-        add = TRUE)
-      on.exit(private$m(webmockr::disable()), add = TRUE)
+      checked_stub <- private$in_stored_stubs(stub, expire)
+      if (!checked_stub$found || (checked_stub$found && checked_stub$rerun)) {
+        if (checked_stub$rerun) {
+          res <- force(...)
+          stub <- private$make_stub(res$method, res$url, res$content)
+        }
+        private$cache_stub(stub)
+      }
+      private$webmock_cleanup()
       return(res)
     },
     init = function(path) {
@@ -66,6 +92,9 @@ midden <- R6::R6Class(
     destroy = function() {
       if (is.null(self$cache)) return(NULL)
       unlink(self$cache$cache_path_get(), TRUE, TRUE)
+    },
+    expire = function(time) {
+      self$expiry <- time
     }
   ),
 
@@ -73,6 +102,11 @@ midden <- R6::R6Class(
     webmock_init = function() {
       private$m(webmockr::enable())
       private$m(webmockr::webmockr_allow_net_connect())
+    },
+    webmock_cleanup = function() {
+      on.exit(private$m(webmockr::webmockr_disable_net_connect()),
+        add = TRUE)
+      on.exit(private$m(webmockr::disable()), add = TRUE)
     },
     m = function(x) if (!self$verbose) suppressMessages(x) else x,
     cleave_q = function(x) sub("\\?.+", "", x),
@@ -87,21 +121,42 @@ midden <- R6::R6Class(
       file.path(self$cache$cache_path_get(), basename(tempfile("_middens")))
     },
     cache_stub = function(stub, file = private$cache_file()) {
-      saveRDS(stub, file = file, compress = TRUE)
+      saveRDS(list(recorded = private$time(), stub = stub), file = file,
+        compress = TRUE)
     },
     load_stubs = function() {
       stubs <- lapply(self$cache$list(), readRDS)
       if (length(stubs) > 0) {
         sr <- webmockr::stub_registry()
-        invisible(lapply(stubs, sr$register_stub))
+        invisible(lapply(stubs, function(w) sr$register_stub(w$stub)))
         private$m(message(length(stubs), " stubs loaded"))
       }
     },
-    in_stored_stubs = function(stub) {
+    in_stored_stubs = function(stub, expire = NULL) {
+      rerun <- FALSE
       ff <- self$cache$list()
-      if (length(ff) == 0) return(FALSE)
+      if (length(ff) == 0) return(list(found = FALSE, rerun = FALSE))
       ss <- lapply(ff, readRDS)
-      any(vapply(ss, function(w) identical(w$to_s(), stub$to_s()), logical(1)))
-    }
+      stub_matches <- vapply(ss, function(w) 
+        identical(w$stub$to_s(), stub$to_s()), logical(1))
+
+      if (!is.null(expire)) {
+        expiry_matches <- vector(length = length(ss))
+        for (i in seq_along(ss)) {
+          stub_expired <- as.POSIXct(private$time(), tz = "UTC") >=
+            (as.POSIXct(ss[[i]]$recorded, tz = "UTC") + expire)
+          if (stub_expired) {
+            rerun <- TRUE
+            unlink(ff[i], force = TRUE)
+          }
+          expiry_matches[i] <- stub_expired
+        }
+      } else {
+        expiry_matches <- rep(TRUE, length(ss))
+      }
+
+      list(found = any(stub_matches & expiry_matches), rerun = rerun)
+    },
+    time = function() format(as.POSIXct(Sys.time()), tz = "UTC", usetz = TRUE)
   )
 )

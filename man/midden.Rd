@@ -13,8 +13,12 @@ web middens
 \item{\code{init(path)}}{
 a directory path
 }
-\item{\code{call(...)}}{
+\item{\code{call(..., expire = NULL)}}{
 an http request code block
+- ...: a http request block
+- expire: (integer) number of seconds until expiry. after this time,
+we force a real HTTP reqeuest even if a matching stub exists.
+times are recorded in UTC.
 }
 }
 }
@@ -31,11 +35,26 @@ x <- midden$new()
 x
 x$init(path = "rainforest")
 x
+# first request is a real HTTP request
+x$call(con$get("get", query = list(stuff = "bananas")))
+# following requests use the cached response
 x$call(con$get("get", query = list(stuff = "bananas")))
 
+# verbose output
 x <- midden$new(verbose = TRUE)
 x$init(path = "rainforest")
 x$call(con$get("get", query = list(stuff = "bananas")))
+
+# set expiration time
+x <- midden$new()
+x$init(path = "grass")
+# set expiry
+x$call(con$get("get", query = list(grass = "tall")), expire = 10)
+## before expiry, get mocked response
+x$call(con$get("get", query = list(grass = "tall")), expire = 10)
+Sys.sleep(10)
+## after expiry, get real response
+x$call(con$get("get", query = list(grass = "tall")), expire = 10)
 }
 }
 \keyword{datasets}
