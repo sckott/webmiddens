@@ -6,7 +6,7 @@ webmiddens
 
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 
-simple caching of mocked HTTP responses, hooking into [webmockr](https://github.com/ropensci/webmockr) 
+simple caching of HTTP requests/responses, hooking into [webmockr](https://github.com/ropensci/webmockr) 
 for the HTTP request matching
 
 ### the need
@@ -55,7 +55,7 @@ con$get(query = list(stuff = "bananas"))
 #>     access-control-allow-origin: *
 #>     content-encoding: gzip
 #>     content-type: text/html; charset=utf-8
-#>     date: Thu, 07 Mar 2019 23:40:19 GMT
+#>     date: Fri, 08 Mar 2019 19:17:54 GMT
 #>     server: nginx
 #>     content-length: 3168
 #>     connection: keep-alive
@@ -91,7 +91,7 @@ x$call(con$get("get", query = list(stuff = "bananas")))
 #>     access-control-allow-origin: *
 #>     content-encoding: gzip
 #>     content-type: application/json
-#>     date: Thu, 07 Mar 2019 23:40:19 GMT
+#>     date: Fri, 08 Mar 2019 19:17:55 GMT
 #>     server: nginx
 #>     content-length: 236
 #>     connection: keep-alive
@@ -122,7 +122,7 @@ list cached items
 
 ```r
 x$cache$list()
-#> [1] "/Users/sckott/Library/Caches/R/rainforest/_middensc50967dd1614"
+#> [1] "/Users/sckott/Library/Caches/R/rainforest/_middens10b7842b5f098"
 # & cleanup
 x$destroy()
 ```
