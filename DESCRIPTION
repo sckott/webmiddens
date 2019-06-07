@@ -2,16 +2,15 @@ Package: webmiddens
 Title: Cache Mocked 'HTTP' Requests
 Description: Cache mocked 'HTTP' requests, leveraging 'webmockr'
     for the 'HTTP' request matching.
-Version: 0.0.1.9100
+Version: 0.0.1.9130
 Authors@R: c(
     person("Scott", "Chamberlain", role = c("aut", "cre"), email =
     "sckott@protonmail.com", comment = c(ORCID="0000-0003-1444-9135")),
     person("rOpenSci", role = "fnd", comment = "https://ropensci.org")
     )
 License: MIT + file LICENSE
-URL: https://github.com/ropensci/webmiddens (devel)
-    https://ropensci.github.io/http-testing-book/ (user manual)
-BugReports: https://github.com/ropensci/webmiddens/issues
+URL: https://github.com/ropenscilabs/webmiddens
+BugReports: https://github.com/ropenscilabs/webmiddens/issues
 LazyData: true
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

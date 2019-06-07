@@ -48,13 +48,14 @@ x$call(con$get("get", query = list(stuff = "bananas")))
 # set expiration time
 x <- midden$new()
 x$init(path = "grass")
+x
 # set expiry
-x$call(con$get("get", query = list(grass = "tall")), expire = 10)
+x$call(con$get("get", query = list(grass = "tall")), expire = 3)
 ## before expiry, get mocked response
-x$call(con$get("get", query = list(grass = "tall")), expire = 10)
-Sys.sleep(10)
+x$call(con$get("get", query = list(grass = "tall")), expire = 3)
+Sys.sleep(5)
 ## after expiry, get real response
-x$call(con$get("get", query = list(grass = "tall")), expire = 10)
+x$call(con$get("get", query = list(grass = "tall")))
 }
 }
 \keyword{datasets}

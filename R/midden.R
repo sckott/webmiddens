@@ -44,12 +44,12 @@
 #' x$init(path = "grass")
 #' x
 #' # set expiry
-#' x$call(con$get("get", query = list(grass = "tall")), expire = 10)
+#' x$call(con$get("get", query = list(grass = "tall")), expire = 3)
 #' ## before expiry, get mocked response
-#' x$call(con$get("get", query = list(grass = "tall")), expire = 10)
-#' Sys.sleep(10)
+#' x$call(con$get("get", query = list(grass = "tall")), expire = 3)
+#' Sys.sleep(5)
 #' ## after expiry, get real response
-#' x$call(con$get("get", query = list(grass = "tall")), expire = 10)
+#' x$call(con$get("get", query = list(grass = "tall")))
 #' }
 midden <- R6::R6Class(
   'midden',
@@ -74,10 +74,12 @@ midden <- R6::R6Class(
       checked_stub <- private$in_stored_stubs(stub, expire)
       if (!checked_stub$found || (checked_stub$found && checked_stub$rerun)) {
         if (checked_stub$rerun) {
+          cat("reruning", sep = "\n")
+          webmockr::disable()
           res <- force(...)
           stub <- private$make_stub(res$method, res$url, res$content)
         }
-        private$cache_stub(stub)
+        private$cache_stub(stub, expire)
       }
       private$webmock_cleanup()
       return(res)
@@ -120,8 +122,9 @@ midden <- R6::R6Class(
     cache_file = function() {
       file.path(self$cache$cache_path_get(), basename(tempfile("_middens")))
     },
-    cache_stub = function(stub, file = private$cache_file()) {
-      saveRDS(list(recorded = private$time(), stub = stub), file = file,
+    cache_stub = function(stub, expire = NULL, file = private$cache_file()) {
+      saveRDS(list(recorded = private$time(), 
+        ttl = expire, stub = stub), file = file,
         compress = TRUE)
     },
     load_stubs = function() {
@@ -140,12 +143,29 @@ midden <- R6::R6Class(
       stub_matches <- vapply(ss, function(w) 
         identical(w$stub$to_s(), stub$to_s()), logical(1))
 
+      # remove those that are expired
+      # if (!is.null(expire)) {
+      #   stub_expired <- as.POSIXct(private$time(), tz = "UTC") >=
+      #       (as.POSIXct(ss[[i]]$recorded, tz = "UTC") + expire)
+      #   ss <- Filter(function(w) {
+      #     !as.POSIXct(private$time(), tz = "UTC") >=
+      #       (as.POSIXct(w$recorded, tz = "UTC") + expire)
+      #   }, ss)
+      # }
+      
+      # FIXME: just added expire param to cache_stub() fxn above
+      # change here to delete all stubs that have ttl that
+      #   means the stub is expired
+      # then we can compare stubs without worrying about time 
+      #   recorded
+
       if (!is.null(expire)) {
         expiry_matches <- vector(length = length(ss))
         for (i in seq_along(ss)) {
           stub_expired <- as.POSIXct(private$time(), tz = "UTC") >=
             (as.POSIXct(ss[[i]]$recorded, tz = "UTC") + expire)
           if (stub_expired) {
+            cat("stub_expired: TRUE", sep = "\n")
             rerun <- TRUE
             unlink(ff[i], force = TRUE)
           }
