@@ -21,8 +21,10 @@ for the HTTP request matching
 well into a use case where another pkg wants to cache responses
 - `memoise` seems close-ish but doesn't fit needs, e.g., no expiry, not specific
 to HTTP requests, etc.
-- we need something specific to HTTP requests, that allows easy expiration handling,
-a few different caching location options, works across HTTP clients, xxx
+- we need something specific to HTTP requests, that allows expiration handling, a few different caching location options, works across HTTP clients, etc
+- caching just the http responses means the rest of the code in the function can change, and the response can still be cached
+    - the downside, vs. memoise, is that we're only caching the http response, so if there's still a lot of time spent processing the response, then the function will still be quite slow
+- memoise is great, but since it caches the whole function call, you don't benefit from individually caching each http request, which we do here. if you cache each http request, then any time you do that same http request, it's response is already cached
 
 ### brainstorming
 
