@@ -17,7 +17,7 @@ for the HTTP request matching
 
 ### the need
 
-- `vcr` is meant really for testing, or sort of script use. i don't think it fits
+- `vcr` is meant really for testing, or script use. i don't think it fits
 well into a use case where another pkg wants to cache responses
 - `memoise` seems close-ish but doesn't fit needs, e.g., no expiry, not specific
 to HTTP requests, etc.
@@ -33,7 +33,8 @@ ETag, Expires (see [ruby's [faraday-http-cache](https://github.com/plataformatec
 we don't need users to be able to look at plain text of caches
 - expiration: set a time to expire. if set to `2019-03-08 00:00:00` and it's
 `2019-03-07 23:00:00`, then 1 hr from now the cache will expire, and a new real HTTP 
-request will need to be made (i.e., the cache will be deleted)
+request will need to be made (i.e., the cache will be deleted whenever the next
+HTTP request is made)
 
 ### how though?
 

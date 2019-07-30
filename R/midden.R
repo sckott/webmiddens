@@ -10,7 +10,7 @@
 #'     \item{`call(..., expire = NULL)`}{
 #'       an http request code block
 #'       - ...: a http request block
-#'       - expire: (integer) number of seconds until expiry. after this time, 
+#'       - expire: (integer) number of seconds until expiry. after this time,
 #'         we force a real HTTP reqeuest even if a matching stub exists.
 #'         times are recorded in UTC.
 #'     }
@@ -19,26 +19,29 @@
 #' @usage NULL
 #' @examples \dontrun{
 #' library(crul)
-#' 
+#'
 #' # without middens
 #' con <- crul::HttpClient$new("https://httpbin.org")
-#' con$get(query = list(stuff = "bananas"))
-#' 
+#' con2 <- crul::HttpClient$new("https://google.com")
+#' con$get("get", query = list(stuff = "bananas"))
+#' con2$get(query = list(q = "stuff"))
+#'
 #' # with middens
 #' x <- midden$new()
 #' x
-#' x$init(path = "rainforest")
+#' x$init(path = "rainforest3")
+#' x$cache
 #' x
 #' # first request is a real HTTP request
 #' x$call(con$get("get", query = list(stuff = "bananas")))
 #' # following requests use the cached response
 #' x$call(con$get("get", query = list(stuff = "bananas")))
-#' 
+#'
 #' # verbose output
 #' x <- midden$new(verbose = TRUE)
 #' x$init(path = "rainforest")
 #' x$call(con$get("get", query = list(stuff = "bananas")))
-#' 
+#'
 #' # set expiration time
 #' x <- midden$new()
 #' x$init(path = "grass")
@@ -70,14 +73,18 @@ midden <- R6::R6Class(
       private$webmock_init()
       private$load_stubs()
       res <- force(...)
-      stub <- private$make_stub(res$method, res$url, res$content)
+      stub <- private$make_stub(res$method, res$url, res$content,
+        res$request$headers, res$response_headers)
       checked_stub <- private$in_stored_stubs(stub, expire)
+      cat(paste0("checked_stub$found: ", checked_stub$found), sep = "\n")
+      cat(paste0("checked_stub$rerun: ", checked_stub$rerun), sep = "\n")
       if (!checked_stub$found || (checked_stub$found && checked_stub$rerun)) {
         if (checked_stub$rerun) {
           cat("reruning", sep = "\n")
           webmockr::disable()
           res <- force(...)
-          stub <- private$make_stub(res$method, res$url, res$content)
+          stub <- private$make_stub(res$method, res$url,
+            res$content, res$request$headers, res$response_headers)
         }
         private$cache_stub(stub, expire)
       }
@@ -112,18 +119,19 @@ midden <- R6::R6Class(
     },
     m = function(x) if (!self$verbose) suppressMessages(x) else x,
     cleave_q = function(x) sub("\\?.+", "", x),
-    make_stub = function(method, url, body) {
+    make_stub = function(method, url, body, request_headers, response_headers) {
       stub <- webmockr::stub_request(method, url)
-      # FIXME: probably set the real headers from the first real request
-      # stub <- wi_th(stub, query = query)
-      stub <- webmockr::to_return(stub, body = body, status = 200)
+      stub <- webmockr::wi_th(stub, headers = request_headers)
+      stub <- webmockr::to_return(stub, body = body, status = 200,
+        headers = response_headers)
       stub
     },
     cache_file = function() {
       file.path(self$cache$cache_path_get(), basename(tempfile("_middens")))
     },
     cache_stub = function(stub, expire = NULL, file = private$cache_file()) {
-      saveRDS(list(recorded = private$time(), 
+      cat(paste0("in cache_stub - going to save to: ", file), sep = "\n")
+      saveRDS(list(recorded = private$time(),
         ttl = expire, stub = stub), file = file,
         compress = TRUE)
     },
@@ -140,7 +148,7 @@ midden <- R6::R6Class(
       ff <- self$cache$list()
       if (length(ff) == 0) return(list(found = FALSE, rerun = FALSE))
       ss <- lapply(ff, readRDS)
-      stub_matches <- vapply(ss, function(w) 
+      stub_matches <- vapply(ss, function(w)
         identical(w$stub$to_s(), stub$to_s()), logical(1))
 
       # remove those that are expired
@@ -152,11 +160,11 @@ midden <- R6::R6Class(
       #       (as.POSIXct(w$recorded, tz = "UTC") + expire)
       #   }, ss)
       # }
-      
+
       # FIXME: just added expire param to cache_stub() fxn above
       # change here to delete all stubs that have ttl that
       #   means the stub is expired
-      # then we can compare stubs without worrying about time 
+      # then we can compare stubs without worrying about time
       #   recorded
 
       if (!is.null(expire)) {
@@ -167,6 +175,7 @@ midden <- R6::R6Class(
           if (stub_expired) {
             cat("stub_expired: TRUE", sep = "\n")
             rerun <- TRUE
+            cat(paste0("in_stored_stubs, deleting file: ", ff[i]), sep = "\n")
             unlink(ff[i], force = TRUE)
           }
           expiry_matches[i] <- stub_expired
@@ -175,7 +184,8 @@ midden <- R6::R6Class(
         expiry_matches <- rep(TRUE, length(ss))
       }
 
-      list(found = any(stub_matches & expiry_matches), rerun = rerun)
+      # list(found = any(stub_matches & expiry_matches), rerun = rerun)
+      list(found = any(stub_matches), rerun = rerun)
     },
     time = function() format(as.POSIXct(Sys.time()), tz = "UTC", usetz = TRUE)
   )

@@ -28,12 +28,15 @@ library(crul)
 
 # without middens
 con <- crul::HttpClient$new("https://httpbin.org")
-con$get(query = list(stuff = "bananas"))
+con2 <- crul::HttpClient$new("https://google.com")
+con$get("get", query = list(stuff = "bananas"))
+con2$get(query = list(q = "stuff"))
 
 # with middens
 x <- midden$new()
 x
-x$init(path = "rainforest")
+x$init(path = "rainforest3")
+x$cache
 x
 # first request is a real HTTP request
 x$call(con$get("get", query = list(stuff = "bananas")))
