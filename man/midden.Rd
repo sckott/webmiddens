@@ -2,26 +2,9 @@
 % Please edit documentation in R/midden.R
 \name{midden}
 \alias{midden}
-\title{web middens}
+\title{midden}
 \description{
-web middens
-
-web middens
-}
-\details{
-\strong{Methods}
-\describe{
-\item{\code{init(path)}}{
-a directory path
-}
-\item{\code{call(..., expire = NULL)}}{
-an http request code block
-- ...: a http request block
-- expire: (integer) number of seconds until expiry. after this time,
-we force a real HTTP reqeuest even if a matching stub exists.
-times are recorded in UTC.
-}
-}
+web middens class
 }
 \examples{
 \dontrun{
@@ -62,6 +45,21 @@ Sys.sleep(5)
 x$call(con$get("get", query = list(grass = "tall")), expire = 3)
 }
 }
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{cache}}{\itemize{
+\item an \code{HoardClient} class, see \code{\link[hoardr:hoard]{hoardr::hoard()}} for help
+}}
+
+\item{\code{cache_path}}{(character) the cache path}
+
+\item{\code{verbose}}{(logical) verbose or not}
+
+\item{\code{expiry}}{(integer) expiry time (seconds)}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -77,50 +75,113 @@ x$call(con$get("get", query = list(grass = "tall")), expire = 3)
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-new"></a>}}
 \subsection{Method \code{new()}}{
+Create a new \code{midden} object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{midden$new(verbose = FALSE)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{verbose}}{(logical) get messages about whats going on.
+default: \code{FALSE}}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A new \code{midden} object
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-print"></a>}}
 \subsection{Method \code{print()}}{
+print method for \code{midden} objects
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{midden$print(x, ...)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{self}
+
+\item{\code{...}}{ignored}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-call"></a>}}
 \subsection{Method \code{call()}}{
+an http request code block
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{midden$call(..., expire = NULL)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{an http request block}
+
+\item{\code{expire}}{(integer) number of seconds until expiry. after this time,
+we force a real HTTP reqeuest even if a matching stub exists.
+times are recorded in UTC.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+http response
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-init"></a>}}
 \subsection{Method \code{init()}}{
+initialize the class with a path for where to cache data
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{midden$init(path)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{path}}{(character) a directory path}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+NULL
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-destroy"></a>}}
 \subsection{Method \code{destroy()}}{
+remove all cached files in the midden
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{midden$destroy()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+NULL
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-expire"></a>}}
 \subsection{Method \code{expire()}}{
+set an expiration time
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{midden$expire(time)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{time}}{(integer) seconds to expire}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+NULL
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

@@ -1,22 +1,6 @@
-#' web middens
-#'
+#' @title midden
+#' @description web middens class
 #' @export
-#' @details
-#' **Methods**
-#'   \describe{
-#'     \item{`init(path)`}{
-#'       a directory path
-#'     }
-#'     \item{`call(..., expire = NULL)`}{
-#'       an http request code block
-#'       - ...: a http request block
-#'       - expire: (integer) number of seconds until expiry. after this time,
-#'         we force a real HTTP reqeuest even if a matching stub exists.
-#'         times are recorded in UTC.
-#'     }
-#'   }
-#' @format NULL
-#' @usage NULL
 #' @examples \dontrun{
 #' library(crul)
 #'
@@ -57,16 +41,33 @@
 midden <- R6::R6Class(
   'midden',
   public = list(
+    #' @field cache - an `HoardClient` class, see [hoardr::hoard()] for help
     cache = NULL,
+    #' @field cache_path (character) the cache path
     cache_path = NULL,
+    #' @field verbose (logical) verbose or not
     verbose = FALSE,
+    #' @field expiry (integer) expiry time (seconds)
     expiry = NULL,
 
+    #' @description Create a new `midden` object
+    #' @param verbose (logical) get messages about whats going on.
+    #' default: `FALSE`
+    #' @return A new `midden` object
     initialize = function(verbose = FALSE) self$verbose <- verbose,
+    #' @description print method for `midden` objects
+    #' @param x self
+    #' @param ... ignored
     print = function(x, ...) {
       cat("<midden> ", sep = "\n")
       cat(paste0("  path: ", self$cache_path), sep = "\n")
     },
+    #' @description an http request code block
+    #' @param ... an http request block
+    #' @param expire (integer) number of seconds until expiry. after this time,
+    #' we force a real HTTP reqeuest even if a matching stub exists.
+    #' times are recorded in UTC.
+    #' @return http response
     call = function(..., expire = NULL) {
       if (is.null(self$cache)) stop("run $init first")
       if (!dir.exists(self$cache$cache_path_get())) self$cache$mkdir()
@@ -91,6 +92,9 @@ midden <- R6::R6Class(
       private$webmock_cleanup()
       return(res)
     },
+    #' @description initialize the class with a path for where to cache data
+    #' @param path (character) a directory path
+    #' @return NULL
     init = function(path) {
       cache_obj <- hoardr::hoard()
       cache_obj$cache_path_set(path)
@@ -98,10 +102,15 @@ midden <- R6::R6Class(
       self$cache_path <- path
       self$cache <- cache_obj
     },
+    #' @description remove all cached files in the midden
+    #' @return NULL
     destroy = function() {
       if (is.null(self$cache)) return(NULL)
       unlink(self$cache$cache_path_get(), TRUE, TRUE)
     },
+    #' @description set an expiration time
+    #' @param time (integer) seconds to expire
+    #' @return NULL
     expire = function(time) {
       self$expiry <- time
     }
