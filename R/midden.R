@@ -14,8 +14,17 @@
 #' x <- midden$new()
 #' x
 #' x$init(path = "rainforest3")
-#' x$cache
 #' x
+#' x$cache
+#' x$expire()
+#' x$expire(5)
+#' x$expire()
+#' x$expire(reset = TRUE)
+#' x$expire()
+#' Sys.setenv(WEBMIDDENS_EXPIRY_SEC = 35)
+#' x$expire()
+#' x$expire(reset = TRUE)
+#' x$expire()
 #' # first request is a real HTTP request
 #' x$r(con$get("get", query = list(stuff = "bananas")))
 #' # following requests use the cached response
@@ -47,8 +56,6 @@ midden <- R6::R6Class(
     cache_path = NULL,
     #' @field verbose (logical) verbose or not
     verbose = FALSE,
-    #' @field expiry (integer) expiry time (seconds)
-    expiry = NULL,
 
     #' @description Create a new `midden` object
     #' @param verbose (logical) get messages about whats going on.
@@ -62,7 +69,11 @@ midden <- R6::R6Class(
     #' @param ... ignored
     print = function(x, ...) {
       cat("<midden> ", sep = "\n")
-      cat(paste0("  path: ", self$cache_path), sep = "\n")
+      pth <- if (inherits(self$cache, "HoardClient"))
+        self$cache$cache_path_get()
+      else
+        self$cache_path
+      cat(paste0("  path: ", pth), sep = "\n")
     },
     #' @description an http request code block
     #' @param ... an http request block
@@ -79,7 +90,8 @@ midden <- R6::R6Class(
       res <- force(...)
       stub <- private$make_stub(res$method, res$url, res$content,
         res$request$headers, res$response_headers)
-      checked_stub <- private$in_stored_stubs(stub, expire)
+      exp <- private$set_expiry(expire)
+      checked_stub <- private$in_stored_stubs(stub, exp)
       private$m(paste0("request found: ", checked_stub$found))
       private$m(paste0("request rerun: ", checked_stub$rerun))
       if (!checked_stub$found || (checked_stub$found && checked_stub$rerun)) {
@@ -90,7 +102,7 @@ midden <- R6::R6Class(
           stub <- private$make_stub(res$method, res$url,
             res$content, res$request$headers, res$response_headers)
         }
-        private$cache_stub(stub, expire)
+        private$cache_stub(stub, exp)
       }
       private$webmock_cleanup()
       return(res)
@@ -118,14 +130,30 @@ midden <- R6::R6Class(
       unlink(self$cache$cache_path_get(), TRUE, TRUE)
     },
     #' @description set an expiration time
-    #' @param time (integer) seconds to expire
+    #' @param expire (integer) seconds to expire - OR, set via the
+    #' environment variable `WEBMIDDENS_EXPIRY_SEC`
+    #' @param reset (logical) reset to `NULL`? default: `FALSE`
     #' @return NULL
-    expire = function(time) {
-      self$expiry <- time
+    #' @examples
+    #' z <- midden$new()
+    #' z$expire(35) # set to expire all requests in 35 seconds
+    #' # or set by env var
+    #' Sys.setenv(WEBMIDDENS_EXPIRY_SEC = 35)
+    expire = function(expire = NULL, reset = FALSE) {
+      assert(reset, "logical")
+      if (reset) {
+        private$expiry <- NULL
+        Sys.setenv("WEBMIDDENS_EXPIRY_SEC" = "")
+        return(NULL)
+      }
+      private$set_expiry(expire)
+      # if (!is.null(time)) private$expiry <- time
+      # return(private$expiry)
     }
   ),
 
   private = list(
+    expiry = NULL,
     webmock_init = function() {
       private$m(webmockr::enable())
       private$m(webmockr::webmockr_allow_net_connect())
@@ -200,6 +228,16 @@ midden <- R6::R6Class(
         stop("WEBMIDDENS_TURN_OFF must be logical",
           call. = FALSE)
       assert(x, "logical")
+    },
+    set_expiry = function(expire = NULL) {
+      expire <-
+        expire %||% private$expiry %||%
+        Sys.getenv("WEBMIDDENS_EXPIRY_SEC") %||% NULL
+      if (!is.null(expire))
+        expire <- tryCatch(as.numeric(expire), warning = function(w) w)
+      assert(expire, c("numeric", "integer"))
+      private$expiry <- expire
+      return(private$expiry)
     }
   )
 )

@@ -41,7 +41,7 @@ test_that("env vars with midden class", {
   Sys.setenv("WEBMIDDENS_TURN_OFF" = "")
 })
 
-test_that("env vars fail as expected", {
+test_that("env vars fail as expected: WEBMIDDENS_TURN_OFF", {
   x <- midden$new()
   x$init(path = "forest31", type = 'tempdir')
   library(crul)
@@ -59,10 +59,38 @@ test_that("env vars fail as expected", {
   Sys.setenv("WEBMIDDENS_TURN_OFF" = "asdfasdfs")
   expect_error(x$r(con$get("get", query = list(fruit = "apples"))))
 
+  # back to an allowed value
   Sys.setenv("WEBMIDDENS_TURN_OFF" = "true")
   expect_is(x$r(con$get("get", query = list(fruit = "apples"))),
     "HttpResponse")
 
   # reset to default
   Sys.setenv("WEBMIDDENS_TURN_OFF" = "")
+})
+
+test_that("env vars fail as expected: WEBMIDDENS_EXPIRY_SEC", {
+  x <- midden$new()
+  x$init(path = "forest33", type = 'tempdir')
+  library(crul)
+  con <- crul::HttpClient$new("https://httpbin.org")
+
+  # env var not set
+  Sys.setenv("WEBMIDDENS_EXPIRY_SEC" = "")
+  expect_is(x$r(con$get("get", query = list(fruit = "apples"))),
+    "HttpResponse")
+
+  # env var set to something not allowed
+  Sys.setenv("WEBMIDDENS_EXPIRY_SEC" = "foobar")
+  expect_error(x$r(con$get("get", query = list(fruit = "apples"))))
+
+  Sys.setenv("WEBMIDDENS_EXPIRY_SEC" = TRUE)
+  expect_error(x$r(con$get("get", query = list(fruit = "apples"))))
+
+  # back to an allowed value
+  Sys.setenv("WEBMIDDENS_EXPIRY_SEC" = 3)
+  expect_is(x$r(con$get("get", query = list(fruit = "apples"))),
+    "HttpResponse")
+
+  # reset to default
+  Sys.unsetenv("WEBMIDDENS_EXPIRY_SEC")
 })

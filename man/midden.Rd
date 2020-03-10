@@ -20,8 +20,17 @@ con2$get(query = list(q = "stuff"))
 x <- midden$new()
 x
 x$init(path = "rainforest3")
-x$cache
 x
+x$cache
+x$expire()
+x$expire(5)
+x$expire()
+x$expire(reset = TRUE)
+x$expire()
+Sys.setenv(WEBMIDDENS_EXPIRY_SEC = 35)
+x$expire()
+x$expire(reset = TRUE)
+x$expire()
 # first request is a real HTTP request
 x$r(con$get("get", query = list(stuff = "bananas")))
 # following requests use the cached response
@@ -44,6 +53,15 @@ Sys.sleep(5)
 ## after expiry, get real response
 x$r(con$get("get", query = list(grass = "tall")), expire = 3)
 }
+
+## ------------------------------------------------
+## Method `midden$expire`
+## ------------------------------------------------
+
+z <- midden$new()
+z$expire(35) # set to expire all requests in 35 seconds
+# or set by env var
+Sys.setenv(WEBMIDDENS_EXPIRY_SEC = 35)
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -55,8 +73,6 @@ x$r(con$get("get", query = list(grass = "tall")), expire = 3)
 \item{\code{cache_path}}{(character) the cache path}
 
 \item{\code{verbose}}{(logical) verbose or not}
-
-\item{\code{expiry}}{(integer) expiry time (seconds)}
 }
 \if{html}{\out{</div>}}
 }
@@ -182,19 +198,33 @@ NULL
 \subsection{Method \code{expire()}}{
 set an expiration time
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{midden$expire(time)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{midden$expire(expire = NULL, reset = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{time}}{(integer) seconds to expire}
+\item{\code{expire}}{(integer) seconds to expire - OR, set via the
+environment variable \code{WEBMIDDENS_EXPIRY_SEC}}
+
+\item{\code{reset}}{(logical) reset to \code{NULL}? default: \code{FALSE}}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
 NULL
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{z <- midden$new()
+z$expire(35) # set to expire all requests in 35 seconds
+# or set by env var
+Sys.setenv(WEBMIDDENS_EXPIRY_SEC = 35)
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}
