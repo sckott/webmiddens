@@ -7,4 +7,5 @@ assert <- function(x, y) {
            paste0(y, collapse = ", "), call. = FALSE)
     }
   }
+  return(x)
 }

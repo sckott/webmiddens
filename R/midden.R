@@ -54,7 +54,9 @@ midden <- R6::R6Class(
     #' @param verbose (logical) get messages about whats going on.
     #' default: `FALSE`
     #' @return A new `midden` object
-    initialize = function(verbose = FALSE) self$verbose <- verbose,
+    initialize = function(verbose = FALSE) {
+      self$verbose <- assert(verbose, "logical")
+    },
     #' @description print method for `midden` objects
     #' @param x self
     #' @param ... ignored
@@ -77,8 +79,8 @@ midden <- R6::R6Class(
       stub <- private$make_stub(res$method, res$url, res$content,
         res$request$headers, res$response_headers)
       checked_stub <- private$in_stored_stubs(stub, expire)
-      cat(paste0("checked_stub$found: ", checked_stub$found), sep = "\n")
-      cat(paste0("checked_stub$rerun: ", checked_stub$rerun), sep = "\n")
+      private$m(paste0("request found: ", checked_stub$found))
+      private$m(paste0("request rerun: ", checked_stub$rerun))
       if (!checked_stub$found || (checked_stub$found && checked_stub$rerun)) {
         if (checked_stub$rerun) {
           cat("reruning", sep = "\n")
@@ -93,11 +95,17 @@ midden <- R6::R6Class(
       return(res)
     },
     #' @description initialize the class with a path for where to cache data
-    #' @param path (character) a directory path
+    #' @param path (character) the path to be appended to the cache path set
+    #' by `type`
+    #' @param type (character) the type of cache, see \pkg{rappdirs}
+    #' @param prefix (character) prefix to the `path` value. Default: "R"
+    #' @param full_path (character) instead of using `path`, `type`, and `prefix`
+    #' just set the full path with this parameter
     #' @return NULL
-    init = function(path) {
+    init = function(path = NULL, type = "user_cache_dir", prefix = "R", 
+      full_path = NULL) {
       cache_obj <- hoardr::hoard()
-      cache_obj$cache_path_set(path)
+      cache_obj$cache_path_set(path, type, prefix, full_path)
       cache_obj$mkdir()
       self$cache_path <- path
       self$cache <- cache_obj
@@ -139,7 +147,7 @@ midden <- R6::R6Class(
       file.path(self$cache$cache_path_get(), basename(tempfile("_middens")))
     },
     cache_stub = function(stub, expire = NULL, file = private$cache_file()) {
-      cat(paste0("in cache_stub - going to save to: ", file), sep = "\n")
+      private$m(paste0("in cache_stub - going to save to: ", file))
       saveRDS(list(recorded = private$time(),
         ttl = expire, stub = stub), file = file,
         compress = TRUE)

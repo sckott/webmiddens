@@ -138,13 +138,26 @@ http response
 \subsection{Method \code{init()}}{
 initialize the class with a path for where to cache data
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{midden$init(path)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{midden$init(
+  path = NULL,
+  type = "user_cache_dir",
+  prefix = "R",
+  full_path = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{path}}{(character) a directory path}
+\item{\code{path}}{(character) the path to be appended to the cache path set
+by \code{type}}
+
+\item{\code{type}}{(character) the type of cache, see \pkg{rappdirs}}
+
+\item{\code{prefix}}{(character) prefix to the \code{path} value. Default: "R"}
+
+\item{\code{full_path}}{(character) instead of using \code{path}, \code{type}, and \code{prefix}
+just set the full path with this parameter}
 }
 \if{html}{\out{</div>}}
 }
