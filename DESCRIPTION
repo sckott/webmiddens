@@ -22,7 +22,8 @@ Imports:
     webmockr,
     hoardr
 Suggests:
-    testthat (>= 2.1.0)
+    testthat (>= 2.1.0),
+    crul
 RoxygenNote: 7.0.2
 X-schema.org-applicationCategory: Web
 X-schema.org-keywords: http, https, API, curl, mock, mocking, fakeweb, http-mocking, testing, testing-tools, tdd
