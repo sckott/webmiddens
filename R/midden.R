@@ -52,7 +52,7 @@
 #' x$call(con$get("get", query = list(grass = "tall")), expire = 3)
 #' Sys.sleep(5)
 #' ## after expiry, get real response
-#' x$call(con$get("get", query = list(grass = "tall")))
+#' x$call(con$get("get", query = list(grass = "tall")), expire = 3)
 #' }
 midden <- R6::R6Class(
   'midden',
@@ -150,22 +150,6 @@ midden <- R6::R6Class(
       ss <- lapply(ff, readRDS)
       stub_matches <- vapply(ss, function(w)
         identical(w$stub$to_s(), stub$to_s()), logical(1))
-
-      # remove those that are expired
-      # if (!is.null(expire)) {
-      #   stub_expired <- as.POSIXct(private$time(), tz = "UTC") >=
-      #       (as.POSIXct(ss[[i]]$recorded, tz = "UTC") + expire)
-      #   ss <- Filter(function(w) {
-      #     !as.POSIXct(private$time(), tz = "UTC") >=
-      #       (as.POSIXct(w$recorded, tz = "UTC") + expire)
-      #   }, ss)
-      # }
-
-      # FIXME: just added expire param to cache_stub() fxn above
-      # change here to delete all stubs that have ttl that
-      #   means the stub is expired
-      # then we can compare stubs without worrying about time
-      #   recorded
 
       if (!is.null(expire)) {
         expiry_matches <- vector(length = length(ss))
