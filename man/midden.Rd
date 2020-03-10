@@ -23,26 +23,26 @@ x$init(path = "rainforest3")
 x$cache
 x
 # first request is a real HTTP request
-x$call(con$get("get", query = list(stuff = "bananas")))
+x$r(con$get("get", query = list(stuff = "bananas")))
 # following requests use the cached response
-x$call(con$get("get", query = list(stuff = "bananas")))
+x$r(con$get("get", query = list(stuff = "bananas")))
 
 # verbose output
 x <- midden$new(verbose = TRUE)
 x$init(path = "rainforest")
-x$call(con$get("get", query = list(stuff = "bananas")))
+x$r(con$get("get", query = list(stuff = "bananas")))
 
 # set expiration time
 x <- midden$new()
 x$init(path = "grass")
 x
 # set expiry
-x$call(con$get("get", query = list(grass = "tall")), expire = 3)
+x$r(con$get("get", query = list(grass = "tall")), expire = 3)
 ## before expiry, get mocked response
-x$call(con$get("get", query = list(grass = "tall")), expire = 3)
+x$r(con$get("get", query = list(grass = "tall")), expire = 3)
 Sys.sleep(5)
 ## after expiry, get real response
-x$call(con$get("get", query = list(grass = "tall")), expire = 3)
+x$r(con$get("get", query = list(grass = "tall")), expire = 3)
 }
 }
 \section{Public fields}{
@@ -65,7 +65,7 @@ x$call(con$get("get", query = list(grass = "tall")), expire = 3)
 \itemize{
 \item \href{#method-new}{\code{midden$new()}}
 \item \href{#method-print}{\code{midden$print()}}
-\item \href{#method-call}{\code{midden$call()}}
+\item \href{#method-r}{\code{midden$r()}}
 \item \href{#method-init}{\code{midden$init()}}
 \item \href{#method-destroy}{\code{midden$destroy()}}
 \item \href{#method-expire}{\code{midden$expire()}}
@@ -111,11 +111,11 @@ print method for \code{midden} objects
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-call"></a>}}
-\subsection{Method \code{call()}}{
+\if{html}{\out{<a id="method-r"></a>}}
+\subsection{Method \code{r()}}{
 an http request code block
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{midden$call(..., expire = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{midden$r(..., expire = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

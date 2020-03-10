@@ -17,26 +17,26 @@
 #' x$cache
 #' x
 #' # first request is a real HTTP request
-#' x$call(con$get("get", query = list(stuff = "bananas")))
+#' x$r(con$get("get", query = list(stuff = "bananas")))
 #' # following requests use the cached response
-#' x$call(con$get("get", query = list(stuff = "bananas")))
+#' x$r(con$get("get", query = list(stuff = "bananas")))
 #'
 #' # verbose output
 #' x <- midden$new(verbose = TRUE)
 #' x$init(path = "rainforest")
-#' x$call(con$get("get", query = list(stuff = "bananas")))
+#' x$r(con$get("get", query = list(stuff = "bananas")))
 #'
 #' # set expiration time
 #' x <- midden$new()
 #' x$init(path = "grass")
 #' x
 #' # set expiry
-#' x$call(con$get("get", query = list(grass = "tall")), expire = 3)
+#' x$r(con$get("get", query = list(grass = "tall")), expire = 3)
 #' ## before expiry, get mocked response
-#' x$call(con$get("get", query = list(grass = "tall")), expire = 3)
+#' x$r(con$get("get", query = list(grass = "tall")), expire = 3)
 #' Sys.sleep(5)
 #' ## after expiry, get real response
-#' x$call(con$get("get", query = list(grass = "tall")), expire = 3)
+#' x$r(con$get("get", query = list(grass = "tall")), expire = 3)
 #' }
 midden <- R6::R6Class(
   'midden',
@@ -68,7 +68,7 @@ midden <- R6::R6Class(
     #' we force a real HTTP reqeuest even if a matching stub exists.
     #' times are recorded in UTC.
     #' @return http response
-    call = function(..., expire = NULL) {
+    r = function(..., expire = NULL) {
       if (is.null(self$cache)) stop("run $init first")
       if (!dir.exists(self$cache$cache_path_get())) self$cache$mkdir()
       private$webmock_init()
