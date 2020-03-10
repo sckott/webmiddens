@@ -4,7 +4,7 @@ man-roxygen/
 ^README.Rmd$
 ^\.travis.yml$
 ^CODE_OF_CONDUCT\.md$
-Makefile
+^Makefile$
 notes.md
 .github
 cran-comments.md
