@@ -6,7 +6,7 @@ webmiddens
 
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 
-simple caching of HTTP requests/responses, hooking into [webmockr](https://github.com/ropensci/webmockr) 
+simple caching of HTTP requests/responses, hooking into webmockr (https://github.com/ropensci/webmockr)
 for the HTTP request matching
 
 ### the need
@@ -24,11 +24,11 @@ to HTTP requests, etc.
 
 - use `webmockr` to match requests (works with `crul` and `httr`, maybe `curl` soon)
 - possibly match on, and expire based on headers: Cache-Control, Age, Last-Modified,
-ETag, Expires (see [ruby's [faraday-http-cache](https://github.com/plataformatec/faraday-http-cache#what-gets-cached)])
+ETag, Expires (see Ruby's faraday-http-cache (https://github.com/plataformatec/faraday-http-cache#what-gets-cached))
 - caching backends: probably all binary to save disk space since most likely
 we don't need users to be able to look at plain text of caches
 - expiration: set a time to expire. if set to `2019-03-08 00:00:00` and it's
-`2019-03-07 23:00:00`, then 1 hr from now the cache will expire, and a new real HTTP 
+`2019-03-07 23:00:00`, then 1 hr from now the cache will expire, and a new real HTTP
 request will need to be made (i.e., the cache will be deleted whenever the next
 HTTP request is made)
 
@@ -49,23 +49,17 @@ con$get(query = list(stuff = "bananas"))
 #> <crul response> 
 #>   url: https://httpbin.org/?stuff=bananas
 #>   request_headers: 
-#>     User-Agent: libcurl/7.54.0 r-curl/4.0 crul/0.8.1.9123
+#>     User-Agent: libcurl/7.64.1 r-curl/4.3 crul/0.9.0
 #>     Accept-Encoding: gzip, deflate
 #>     Accept: application/json, text/xml, application/xml, */*
 #>   response_headers: 
-#>     status: HTTP/1.1 200 OK
-#>     access-control-allow-credentials: true
-#>     access-control-allow-origin: *
-#>     content-encoding: gzip
+#>     status: HTTP/2 200 
+#>     date: Tue, 10 Mar 2020 16:32:15 GMT
 #>     content-type: text/html; charset=utf-8
-#>     date: Tue, 30 Jul 2019 15:00:11 GMT
-#>     referrer-policy: no-referrer-when-downgrade
-#>     server: nginx
-#>     x-content-type-options: nosniff
-#>     x-frame-options: DENY
-#>     x-xss-protection: 1; mode=block
-#>     content-length: 3168
-#>     connection: keep-alive
+#>     content-length: 9593
+#>     server: gunicorn/19.9.0
+#>     access-control-allow-origin: *
+#>     access-control-allow-credentials: true
 #>   params: 
 #>     stuff: bananas
 #>   status: 200
@@ -88,27 +82,21 @@ first request is a real HTTP request
 x$call(con$get("get", query = list(stuff = "bananas")))
 #> checked_stub$found: FALSE
 #> checked_stub$rerun: FALSE
-#> in cache_stub - going to save to: /Users/sckott/Library/Caches/R/rainforest/_middens809d20383777
+#> in cache_stub - going to save to: /Users/sckott/Library/Caches/R/rainforest/_middensfbf47fcc152f
 #> <crul response> 
 #>   url: https://httpbin.org/get?stuff=bananas
 #>   request_headers: 
-#>     User-Agent: libcurl/7.54.0 r-curl/4.0 crul/0.8.1.9123
+#>     User-Agent: libcurl/7.64.1 r-curl/4.3 crul/0.9.0
 #>     Accept-Encoding: gzip, deflate
 #>     Accept: application/json, text/xml, application/xml, */*
 #>   response_headers: 
-#>     status: HTTP/1.1 200 OK
-#>     access-control-allow-credentials: true
-#>     access-control-allow-origin: *
-#>     content-encoding: gzip
+#>     status: HTTP/2 200 
+#>     date: Tue, 10 Mar 2020 16:32:15 GMT
 #>     content-type: application/json
-#>     date: Tue, 30 Jul 2019 15:00:12 GMT
-#>     referrer-policy: no-referrer-when-downgrade
-#>     server: nginx
-#>     x-content-type-options: nosniff
-#>     x-frame-options: DENY
-#>     x-xss-protection: 1; mode=block
-#>     content-length: 236
-#>     connection: keep-alive
+#>     content-length: 405
+#>     server: gunicorn/19.9.0
+#>     access-control-allow-origin: *
+#>     access-control-allow-credentials: true
 #>   params: 
 #>     stuff: bananas
 #>   status: 200
@@ -124,23 +112,17 @@ x$call(con$get("get", query = list(stuff = "bananas")))
 #> <crul response> 
 #>   url: https://httpbin.org/get?stuff=bananas
 #>   request_headers: 
-#>     User-Agent: libcurl/7.54.0 r-curl/4.0 crul/0.8.1.9123
+#>     User-Agent: libcurl/7.64.1 r-curl/4.3 crul/0.9.0
 #>     Accept-Encoding: gzip, deflate
 #>     Accept: application/json, text/xml, application/xml, */*
 #>   response_headers: 
-#>     status: HTTP/1.1 200 OK
-#>     access-control-allow-credentials: true
-#>     access-control-allow-origin: *
-#>     content-encoding: gzip
+#>     status: HTTP/2 200 
+#>     date: Tue, 10 Mar 2020 16:32:15 GMT
 #>     content-type: application/json
-#>     date: Tue, 30 Jul 2019 15:00:12 GMT
-#>     referrer-policy: no-referrer-when-downgrade
-#>     server: nginx
-#>     x-content-type-options: nosniff
-#>     x-frame-options: DENY
-#>     x-xss-protection: 1; mode=block
-#>     content-length: 236
-#>     connection: keep-alive
+#>     content-length: 405
+#>     server: gunicorn/19.9.0
+#>     access-control-allow-origin: *
+#>     access-control-allow-credentials: true
 #>   params: 
 #>     stuff: bananas
 #>   status: 200
@@ -151,7 +133,7 @@ list cached items
 
 ```r
 x$cache$list()
-#> [1] "/Users/sckott/Library/Caches/R/rainforest/_middens809d20383777"
+#> [1] "/Users/sckott/Library/Caches/R/rainforest/_middensfbf47fcc152f"
 # & cleanup
 x$destroy()
 ```
@@ -161,7 +143,9 @@ x$destroy()
 * Please [report any issues or bugs](https://github.com/ropensci/webmiddens/issues).
 * License: MIT
 * Get citation information for `webmiddens` in R doing `citation(package = 'webmiddens')`
-* Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md).
+* Please note that this project is released with a [Contributor Code of Conduct][coc].
 By participating in this project you agree to abide by its terms.
 
 [![ropensci_footer](https://ropensci.org/public_images/github_footer.png)](https://ropensci.org)
+
+[coc]: https://github.com/ropenscilabs/webmiddens/blob/master/CODE_OF_CONDUCT.md
