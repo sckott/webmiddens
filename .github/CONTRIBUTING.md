@@ -15,7 +15,3 @@
 * Submit a pull request to home base at `ropenscilabs/webmiddens`
 
 ### Also, check out our [discussion forum](https://discuss.ropensci.org)
-
-### Prefer to Email? Get in touch: [myrmecocystus@gmail.com](mailto:myrmecocystus@gmail.com)
-
-### Thanks for contributing!
