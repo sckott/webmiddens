@@ -71,6 +71,7 @@ midden <- R6::R6Class(
     #' times are recorded in UTC.
     #' @return http response
     r = function(..., expire = NULL) {
+      if (private$middens_turned_off()) return(force(...))
       if (is.null(self$cache)) stop("run $init first")
       if (!dir.exists(self$cache$cache_path_get())) self$cache$mkdir()
       private$webmock_init()
@@ -83,7 +84,7 @@ midden <- R6::R6Class(
       private$m(paste0("request rerun: ", checked_stub$rerun))
       if (!checked_stub$found || (checked_stub$found && checked_stub$rerun)) {
         if (checked_stub$rerun) {
-          cat("reruning", sep = "\n")
+          private$m("reruning")
           webmockr::disable()
           res <- force(...)
           stub <- private$make_stub(res$method, res$url,
@@ -128,11 +129,14 @@ midden <- R6::R6Class(
     webmock_init = function() {
       private$m(webmockr::enable())
       private$m(webmockr::webmockr_allow_net_connect())
+      Sys.setenv(VCR_TURN_OFF = TRUE)
+      if ("package:vcr" %in% search()) unloadNamespace("vcr")
     },
     webmock_cleanup = function() {
       on.exit(private$m(webmockr::webmockr_disable_net_connect()),
         add = TRUE)
       on.exit(private$m(webmockr::disable()), add = TRUE)
+      on.exit(Sys.setenv(VCR_TURN_OFF = FALSE), add = TRUE)
     },
     m = function(x) if (!self$verbose) suppressMessages(x) else x,
     cleave_q = function(x) sub("\\?.+", "", x),
@@ -174,9 +178,9 @@ midden <- R6::R6Class(
           stub_expired <- as.POSIXct(private$time(), tz = "UTC") >=
             (as.POSIXct(ss[[i]]$recorded, tz = "UTC") + expire)
           if (stub_expired) {
-            cat("stub_expired: TRUE", sep = "\n")
+            private$m("stub_expired: TRUE")
             rerun <- TRUE
-            cat(paste0("in_stored_stubs, deleting file: ", ff[i]), sep = "\n")
+            private$m(paste0("in_stored_stubs, deleting file: ", ff[i]))
             unlink(ff[i], force = TRUE)
           }
           expiry_matches[i] <- stub_expired
@@ -188,6 +192,14 @@ midden <- R6::R6Class(
       # list(found = any(stub_matches & expiry_matches), rerun = rerun)
       list(found = any(stub_matches), rerun = rerun)
     },
-    time = function() format(as.POSIXct(Sys.time()), tz = "UTC", usetz = TRUE)
+    time = function() format(as.POSIXct(Sys.time()), tz = "UTC", usetz = TRUE),
+    middens_turned_off = function() {
+      x <- Sys.getenv("WEBMIDDENS_TURN_OFF", FALSE)
+      x <- if (x == "") FALSE else as.logical(x)
+      if (is.na(x))
+        stop("WEBMIDDENS_TURN_OFF must be logical",
+          call. = FALSE)
+      assert(x, "logical")
+    }
   )
 )
