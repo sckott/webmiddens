@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 simple caching of HTTP requests/responses, hooking into webmockr (https://github.com/ropensci/webmockr)
 for the HTTP request matching
 
+A midden is a debris pile constructed by a woodrat/pack rat (https://en.wikipedia.org/wiki/Pack_rat#Midden)
+
 ### the need
 
 - `vcr` is meant really for testing, or script use. i don't think it fits
@@ -67,13 +69,13 @@ x$destroy()
 first request is a real HTTP request
 
 ```{r}
-x$call(con$get("get", query = list(stuff = "bananas")))
+x$r(con$get("get", query = list(stuff = "bananas")))
 ```
 
 second request uses the cached response from the first request
 
 ```{r}
-x$call(con$get("get", query = list(stuff = "bananas")))
+x$r(con$get("get", query = list(stuff = "bananas")))
 ```
 
 list cached items

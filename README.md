@@ -10,6 +10,8 @@ webmiddens
 simple caching of HTTP requests/responses, hooking into webmockr (https://github.com/ropensci/webmockr)
 for the HTTP request matching
 
+A midden is a debris pile constructed by a woodrat/pack rat (https://en.wikipedia.org/wiki/Pack_rat#Midden)
+
 ### the need
 
 - `vcr` is meant really for testing, or script use. i don't think it fits
@@ -55,7 +57,7 @@ con$get(query = list(stuff = "bananas"))
 #>     Accept: application/json, text/xml, application/xml, */*
 #>   response_headers: 
 #>     status: HTTP/2 200 
-#>     date: Tue, 10 Mar 2020 16:32:15 GMT
+#>     date: Wed, 11 Mar 2020 16:46:30 GMT
 #>     content-type: text/html; charset=utf-8
 #>     content-length: 9593
 #>     server: gunicorn/19.9.0
@@ -80,10 +82,7 @@ first request is a real HTTP request
 
 
 ```r
-x$call(con$get("get", query = list(stuff = "bananas")))
-#> checked_stub$found: FALSE
-#> checked_stub$rerun: FALSE
-#> in cache_stub - going to save to: /Users/sckott/Library/Caches/R/rainforest/_middensfbf47fcc152f
+x$r(con$get("get", query = list(stuff = "bananas")))
 #> <crul response> 
 #>   url: https://httpbin.org/get?stuff=bananas
 #>   request_headers: 
@@ -92,7 +91,7 @@ x$call(con$get("get", query = list(stuff = "bananas")))
 #>     Accept: application/json, text/xml, application/xml, */*
 #>   response_headers: 
 #>     status: HTTP/2 200 
-#>     date: Tue, 10 Mar 2020 16:32:15 GMT
+#>     date: Wed, 11 Mar 2020 16:46:30 GMT
 #>     content-type: application/json
 #>     content-length: 405
 #>     server: gunicorn/19.9.0
@@ -107,9 +106,7 @@ second request uses the cached response from the first request
 
 
 ```r
-x$call(con$get("get", query = list(stuff = "bananas")))
-#> checked_stub$found: TRUE
-#> checked_stub$rerun: FALSE
+x$r(con$get("get", query = list(stuff = "bananas")))
 #> <crul response> 
 #>   url: https://httpbin.org/get?stuff=bananas
 #>   request_headers: 
@@ -118,7 +115,7 @@ x$call(con$get("get", query = list(stuff = "bananas")))
 #>     Accept: application/json, text/xml, application/xml, */*
 #>   response_headers: 
 #>     status: HTTP/2 200 
-#>     date: Tue, 10 Mar 2020 16:32:15 GMT
+#>     date: Wed, 11 Mar 2020 16:46:30 GMT
 #>     content-type: application/json
 #>     content-length: 405
 #>     server: gunicorn/19.9.0
@@ -134,7 +131,7 @@ list cached items
 
 ```r
 x$cache$list()
-#> [1] "/Users/sckott/Library/Caches/R/rainforest/_middensfbf47fcc152f"
+#> [1] "/Users/sckott/Library/Caches/R/rainforest/_middens41e115ac87fc"
 # & cleanup
 x$destroy()
 ```
