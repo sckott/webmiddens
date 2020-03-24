@@ -20,7 +20,7 @@ well into a use case where another pkg wants to cache responses
 to HTTP requests, etc.
 - we need something specific to HTTP requests, that allows expiration handling, a few different caching location options, works across HTTP clients, etc
 - caching just the http responses means the rest of the code in the function can change, and the response can still be cached
-    - the downside, vs. memoise, is that we're only caching the http response, so if there's still a lot of time spent processing the response, then the function will still be quite slow
+    - the downside, vs. memoise, is that we're only caching the http response, so if there's still a lot of time spent processing the response, then the function will still be quite slow - BUT, if the HTTP response processing code is within a function, you could memoise that function
 - memoise is great, but since it caches the whole function call, you don't benefit from individually caching each http request, which we do here. if you cache each http request, then any time you do that same http request, it's response is already cached
 
 ### brainstorming
@@ -57,7 +57,7 @@ con$get(query = list(stuff = "bananas"))
 #>     Accept: application/json, text/xml, application/xml, */*
 #>   response_headers: 
 #>     status: HTTP/2 200 
-#>     date: Wed, 11 Mar 2020 16:46:30 GMT
+#>     date: Tue, 24 Mar 2020 15:28:53 GMT
 #>     content-type: text/html; charset=utf-8
 #>     content-length: 9593
 #>     server: gunicorn/19.9.0
@@ -91,7 +91,7 @@ x$r(con$get("get", query = list(stuff = "bananas")))
 #>     Accept: application/json, text/xml, application/xml, */*
 #>   response_headers: 
 #>     status: HTTP/2 200 
-#>     date: Wed, 11 Mar 2020 16:46:30 GMT
+#>     date: Tue, 24 Mar 2020 15:28:53 GMT
 #>     content-type: application/json
 #>     content-length: 405
 #>     server: gunicorn/19.9.0
@@ -115,7 +115,7 @@ x$r(con$get("get", query = list(stuff = "bananas")))
 #>     Accept: application/json, text/xml, application/xml, */*
 #>   response_headers: 
 #>     status: HTTP/2 200 
-#>     date: Wed, 11 Mar 2020 16:46:30 GMT
+#>     date: Tue, 24 Mar 2020 15:28:53 GMT
 #>     content-type: application/json
 #>     content-length: 405
 #>     server: gunicorn/19.9.0
@@ -131,7 +131,7 @@ list cached items
 
 ```r
 x$cache$list()
-#> [1] "/Users/sckott/Library/Caches/R/rainforest/_middens41e115ac87fc"
+#> [1] "/Users/sckott/Library/Caches/R/rainforest/_middensaea9349d98f1"
 # & cleanup
 x$destroy()
 ```
