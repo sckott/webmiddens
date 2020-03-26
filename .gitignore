@@ -7,3 +7,4 @@ revdep/checks.noindex
 revdep/data.sqlite
 revdep/library.noindex
 notes.R
+gettinstarted.R
