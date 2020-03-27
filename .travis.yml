@@ -14,6 +14,9 @@ jobs:
 r_binary_packages:
   - covr
 
+r_github_packages:
+  - ropensci/webmockr@middens
+
 after_success:
   - if [[ "${R_CODECOV}" ]]; then R -e 'covr::codecov()'; fi
 

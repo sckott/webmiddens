@@ -10,6 +10,6 @@ notes.md
 cran-comments.md
 ^codemeta\.json$
 revdep/
-appveyor.yml
+^appveyor.yml$
 notes.R
 gettinstarted.R
