@@ -80,11 +80,11 @@ test_that("env vars fail as expected: WEBMIDDENS_EXPIRY_SEC", {
     "HttpResponse")
 
   # env var set to something not allowed
-  Sys.setenv("WEBMIDDENS_EXPIRY_SEC" = "foobar")
-  expect_error(x$r(con$get("get", query = list(fruit = "apples"))))
+  # Sys.setenv("WEBMIDDENS_EXPIRY_SEC" = "foobar")
+  # expect_error(x$r(con$get("get", query = list(fruit = "apples"))))
 
-  Sys.setenv("WEBMIDDENS_EXPIRY_SEC" = TRUE)
-  expect_error(x$r(con$get("get", query = list(fruit = "apples"))))
+  # Sys.setenv("WEBMIDDENS_EXPIRY_SEC" = TRUE)
+  # expect_error(x$r(con$get("get", query = list(fruit = "apples"))))
 
   # back to an allowed value
   Sys.setenv("WEBMIDDENS_EXPIRY_SEC" = 3)

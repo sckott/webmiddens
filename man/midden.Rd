@@ -44,14 +44,15 @@ x$r(con$get("get", query = list(stuff = "bananas")))
 # set expiration time
 x <- midden$new()
 x$init(path = "grass")
+x$expire(3)
 x
-# set expiry
-x$r(con$get("get", query = list(grass = "tall")), expire = 3)
+# real request
+x$r(con$get("get", query = list(grass = "tall")))
 ## before expiry, get mocked response
-x$r(con$get("get", query = list(grass = "tall")), expire = 3)
+x$r(con$get("get", query = list(grass = "tall")))
 Sys.sleep(5)
 ## after expiry, get real response
-x$r(con$get("get", query = list(grass = "tall")), expire = 3)
+x$r(con$get("get", query = list(grass = "tall")))
 }
 
 ## ------------------------------------------------
@@ -84,12 +85,15 @@ Sys.setenv(WEBMIDDENS_EXPIRY_SEC = 35)
 \item \href{#method-r}{\code{midden$r()}}
 \item \href{#method-init}{\code{midden$init()}}
 \item \href{#method-destroy}{\code{midden$destroy()}}
+\item \href{#method-cleanup}{\code{midden$cleanup()}}
 \item \href{#method-expire}{\code{midden$expire()}}
+\item \href{#method-cache_response}{\code{midden$cache_response()}}
 \item \href{#method-clone}{\code{midden$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-new"></a>}}
+\if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
 Create a new \code{midden} object
 \subsection{Usage}{
@@ -110,6 +114,7 @@ A new \code{midden} object
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
 \subsection{Method \code{print()}}{
 print method for \code{midden} objects
 \subsection{Usage}{
@@ -128,20 +133,17 @@ print method for \code{midden} objects
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-r"></a>}}
+\if{latex}{\out{\hypertarget{method-r}{}}}
 \subsection{Method \code{r()}}{
-an http request code block
+execute an http request code block
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{midden$r(..., expire = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{midden$r(...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{an http request block}
-
-\item{\code{expire}}{(integer) number of seconds until expiry. after this time,
-we force a real HTTP reqeuest even if a matching stub exists.
-times are recorded in UTC.}
+\item{\code{...}}{any function that makes an http request}
 }
 \if{html}{\out{</div>}}
 }
@@ -151,6 +153,7 @@ http response
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-init"></a>}}
+\if{latex}{\out{\hypertarget{method-init}{}}}
 \subsection{Method \code{init()}}{
 initialize the class with a path for where to cache data
 \subsection{Usage}{
@@ -183,8 +186,9 @@ NULL
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-destroy"></a>}}
+\if{latex}{\out{\hypertarget{method-destroy}{}}}
 \subsection{Method \code{destroy()}}{
-remove all cached files in the midden
+remove all cached files in the midden, including directory
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{midden$destroy()}\if{html}{\out{</div>}}
 }
@@ -194,7 +198,22 @@ NULL
 }
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-cleanup"></a>}}
+\if{latex}{\out{\hypertarget{method-cleanup}{}}}
+\subsection{Method \code{cleanup()}}{
+remove all cached files in the midden, but leave the
+directory
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{midden$cleanup()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+NULL
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-expire"></a>}}
+\if{latex}{\out{\hypertarget{method-expire}{}}}
 \subsection{Method \code{expire()}}{
 set an expiration time
 \subsection{Usage}{
@@ -227,7 +246,27 @@ Sys.setenv(WEBMIDDENS_EXPIRY_SEC = 35)
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-cache_response"></a>}}
+\if{latex}{\out{\hypertarget{method-cache_response}{}}}
+\subsection{Method \code{cache_response()}}{
+cache response
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{midden$cache_response(x, exp)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{x}}{a crul HttpResponse}
+
+\item{\code{exp}}{(integer) seconds to expire}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

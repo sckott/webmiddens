@@ -38,14 +38,15 @@
 #' # set expiration time
 #' x <- midden$new()
 #' x$init(path = "grass")
+#' x$expire(3)
 #' x
-#' # set expiry
-#' x$r(con$get("get", query = list(grass = "tall")), expire = 3)
+#' # real request
+#' x$r(con$get("get", query = list(grass = "tall")))
 #' ## before expiry, get mocked response
-#' x$r(con$get("get", query = list(grass = "tall")), expire = 3)
+#' x$r(con$get("get", query = list(grass = "tall")))
 #' Sys.sleep(5)
 #' ## after expiry, get real response
-#' x$r(con$get("get", query = list(grass = "tall")), expire = 3)
+#' x$r(con$get("get", query = list(grass = "tall")))
 #' }
 midden <- R6::R6Class(
   'midden',
@@ -63,6 +64,7 @@ midden <- R6::R6Class(
     #' @return A new `midden` object
     initialize = function(verbose = FALSE) {
       self$verbose <- assert(verbose, "logical")
+      mdenv$current_midden <- self
     },
     #' @description print method for `midden` objects
     #' @param x self
@@ -74,38 +76,21 @@ midden <- R6::R6Class(
       else
         self$cache_path
       cat(paste0("  path: ", pth), sep = "\n")
+      cat(paste0("  expiry (sec): ", private$expiry %||% "not set"),
+        sep = "\n")
     },
-    #' @description an http request code block
-    #' @param ... an http request block
-    #' @param expire (integer) number of seconds until expiry. after this time,
-    #' we force a real HTTP reqeuest even if a matching stub exists.
-    #' times are recorded in UTC.
+    #' @description execute an http request code block
+    #' @param ... any function that makes an http request
     #' @return http response
-    r = function(..., expire = NULL) {
+    r = function(...) {
+      on.exit(webmock_cleanup(), add = TRUE)
       if (private$middens_turned_off()) return(force(...))
       if (is.null(self$cache)) stop("run $init first")
       if (!dir.exists(self$cache$cache_path_get())) self$cache$mkdir()
       private$webmock_init()
+      private$clear_expired_stubs()
       private$load_stubs()
-      res <- force(...)
-      stub <- private$make_stub(res$method, res$url, res$content,
-        res$request$headers, res$response_headers)
-      exp <- private$set_expiry(expire)
-      checked_stub <- private$in_stored_stubs(stub, exp)
-      private$m(paste0("request found: ", checked_stub$found))
-      private$m(paste0("request rerun: ", checked_stub$rerun))
-      if (!checked_stub$found || (checked_stub$found && checked_stub$rerun)) {
-        if (checked_stub$rerun) {
-          private$m("reruning")
-          webmockr::disable()
-          res <- force(...)
-          stub <- private$make_stub(res$method, res$url,
-            res$content, res$request$headers, res$response_headers)
-        }
-        private$cache_stub(stub, exp)
-      }
-      private$webmock_cleanup()
-      return(res)
+      force(...)
     },
     #' @description initialize the class with a path for where to cache data
     #' @param path (character) the path to be appended to the cache path set
@@ -122,12 +107,21 @@ midden <- R6::R6Class(
       cache_obj$mkdir()
       self$cache_path <- path
       self$cache <- cache_obj
+      # set expiry
+      self$expire()
     },
-    #' @description remove all cached files in the midden
+    #' @description remove all cached files in the midden, including directory
     #' @return NULL
     destroy = function() {
       if (is.null(self$cache)) return(NULL)
       unlink(self$cache$cache_path_get(), TRUE, TRUE)
+    },
+    #' @description remove all cached files in the midden, but leave the
+    #' directory
+    #' @return NULL
+    cleanup = function() {
+      if (is.null(self$cache)) return(NULL)
+      unlink(self$cache$delete_all(), TRUE, TRUE)
     },
     #' @description set an expiration time
     #' @param expire (integer) seconds to expire - OR, set via the
@@ -147,8 +141,15 @@ midden <- R6::R6Class(
         return(NULL)
       }
       private$set_expiry(expire)
-      # if (!is.null(time)) private$expiry <- time
-      # return(private$expiry)
+    },
+
+    #' @description cache response
+    #' @param x a crul HttpResponse
+    #' @param exp (integer) seconds to expire
+    cache_response = function(x, exp) {
+      stub <- private$make_stub(x$method, x$url,
+        x$content, x$request$headers, x$response_headers)
+      private$cache_stub(stub, exp)
     }
   ),
 
@@ -159,12 +160,6 @@ midden <- R6::R6Class(
       private$m(webmockr::webmockr_allow_net_connect())
       Sys.setenv(VCR_TURN_OFF = TRUE)
       if ("package:vcr" %in% search()) unloadNamespace("vcr")
-    },
-    webmock_cleanup = function() {
-      on.exit(private$m(webmockr::webmockr_disable_net_connect()),
-        add = TRUE)
-      on.exit(private$m(webmockr::disable()), add = TRUE)
-      on.exit(Sys.setenv(VCR_TURN_OFF = FALSE), add = TRUE)
     },
     m = function(x) if (!self$verbose) suppressMessages(x) else x,
     cleave_q = function(x) sub("\\?.+", "", x),
@@ -184,6 +179,33 @@ midden <- R6::R6Class(
         ttl = expire, stub = stub), file = file,
         compress = TRUE)
     },
+    # clear stubs from webmockr stub registry
+    clear_stubs = function() {
+      webmockr::stub_registry_clear()
+    },
+    # clear stubs on disk, does not touch webmockr stub registry
+    clear_expired_stubs = function() {
+      if (is.null(private$expiry)) return(NULL)
+      ff <- self$cache$list()
+      if (length(ff) == 0) {
+        private$m("no stubs expired")
+        return(NULL)
+      }
+      ss <- lapply(ff, readRDS)
+
+      if (!is.null(private$expiry)) {
+        expiry_matches <- vector(length = length(ss))
+        for (i in seq_along(ss)) {
+          stub_expired <- as.POSIXct(private$time(), tz = "UTC") >=
+            (as.POSIXct(ss[[i]]$recorded, tz = "UTC") + private$expiry)
+          if (stub_expired) {
+            private$m("stub_expired: TRUE")
+            private$m(paste0("deleting file: ", ff[i]))
+            unlink(ff[i], force = TRUE)
+          }
+        }
+      }
+    },
     load_stubs = function() {
       stubs <- lapply(self$cache$list(), readRDS)
       if (length(stubs) > 0) {
@@ -191,34 +213,6 @@ midden <- R6::R6Class(
         invisible(lapply(stubs, function(w) sr$register_stub(w$stub)))
         private$m(message(length(stubs), " stubs loaded"))
       }
-    },
-    in_stored_stubs = function(stub, expire = NULL) {
-      rerun <- FALSE
-      ff <- self$cache$list()
-      if (length(ff) == 0) return(list(found = FALSE, rerun = FALSE))
-      ss <- lapply(ff, readRDS)
-      stub_matches <- vapply(ss, function(w)
-        identical(w$stub$to_s(), stub$to_s()), logical(1))
-
-      if (!is.null(expire)) {
-        expiry_matches <- vector(length = length(ss))
-        for (i in seq_along(ss)) {
-          stub_expired <- as.POSIXct(private$time(), tz = "UTC") >=
-            (as.POSIXct(ss[[i]]$recorded, tz = "UTC") + expire)
-          if (stub_expired) {
-            private$m("stub_expired: TRUE")
-            rerun <- TRUE
-            private$m(paste0("in_stored_stubs, deleting file: ", ff[i]))
-            unlink(ff[i], force = TRUE)
-          }
-          expiry_matches[i] <- stub_expired
-        }
-      } else {
-        expiry_matches <- rep(TRUE, length(ss))
-      }
-
-      # list(found = any(stub_matches & expiry_matches), rerun = rerun)
-      list(found = any(stub_matches), rerun = rerun)
     },
     time = function() format(as.POSIXct(Sys.time()), tz = "UTC", usetz = TRUE),
     middens_turned_off = function() {

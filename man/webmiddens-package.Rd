@@ -4,7 +4,7 @@
 \name{webmiddens-package}
 \alias{webmiddens-package}
 \alias{webmiddens}
-\title{Cache mocked HTTP requests}
+\title{webmiddens}
 \description{
 Cache mocked HTTP requests
 }

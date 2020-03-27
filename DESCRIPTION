@@ -2,7 +2,7 @@ Package: webmiddens
 Title: Cache Mocked 'HTTP' Requests
 Description: Cache mocked 'HTTP' requests, leveraging 'webmockr'
     for the 'HTTP' request matching.
-Version: 0.0.2.94
+Version: 0.0.3.91
 Authors@R: c(
     person("Scott", "Chamberlain", role = c("aut", "cre"),
         email = "sckott@protonmail.com", 
@@ -19,12 +19,14 @@ Language: en-US
 Roxygen: list(markdown = TRUE)
 Imports:
     R6,
-    webmockr,
+    webmockr (>= 0.6.2.91),
     hoardr
 Suggests:
-    testthat (>= 2.1.0),
+    testthat,
+    jsonlite,
     crul
-RoxygenNote: 7.0.2
+Remotes: ropensci/webmockr@middens
+RoxygenNote: 7.1.0
 X-schema.org-applicationCategory: Web
 X-schema.org-keywords: http, https, API, curl, mock, mocking, fakeweb, http-mocking, testing, testing-tools, tdd
 X-schema.org-isPartOf: https://ropensci.org

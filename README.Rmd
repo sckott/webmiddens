@@ -41,48 +41,128 @@ we don't need users to be able to look at plain text of caches
 request will need to be made (i.e., the cache will be deleted whenever the next
 HTTP request is made)
 
-### how though?
+### installation
+
+```{r eval=FALSE}
+remotes::install_github("ropenscilabs/webmiddens")
+```
+
+### use_midden()
 
 ```{r}
 library(webmiddens)
 library(crul)
-con <- crul::HttpClient$new("https://httpbin.org")
 ```
 
-without webmiddens
+Let's say you have some function `http_request()` that does an HTTP request that
+you re-use in various parts of your project or package
 
 ```{r}
-con$get(query = list(stuff = "bananas"))
+http_request <- function(...) {
+  x <- crul::HttpClient$new("https://httpbin.org", opts = list(...))
+  x$get("get")
+}
 ```
 
-with webmiddens, make a midden object first
+And you have a function `some_fxn()` that uses `http_request()` to do the HTTP 
+request, then proces the results to a data.frame or list, etc. This is a super
+common pattern in a project or R package that deals with web resources.
 
 ```{r}
-x <- midden$new()
-x$init(path = "rainforest")
+some_fxn <- function(...) {
+  res <- http_request(...)
+  jsonlite::fromJSON(res$parse("UTF-8"))
+}
 ```
 
-```{r echo=FALSE}
-x$destroy()
+Without `webmiddens` the HTTP request happens as usual and all is good
+
+```{r}
+some_fxn()
 ```
+
+Now, with `webmiddens`:
 
 first request is a real HTTP request
 
 ```{r}
-x$r(con$get("get", query = list(stuff = "bananas")))
+res1 <- use_midden(some_fxn())
 ```
 
 second request uses the cached response from the first request
 
 ```{r}
+res2 <- use_midden(some_fxn())
+```
+
+### the midden class
+
+```{r}
+x <- midden$new()
+x # no path
+# Run $init() to set the path
+x$init(path = "forest")
+x
+```
+
+The `cache` slot has a `hoardr` object which you can use to fiddle with
+files, see `?hoardr::hoard`
+
+```{r}
+x$cache
+```
+
+Use `expire()` to set the expire time (in seconds). You can set it through
+passing to `expire()` or through the environment variable `WEBMIDDENS_EXPIRY_SEC`
+
+```{r}
+x$expire()
+x$expire(5)
+x$expire()
+x$expire(reset = TRUE)
+x$expire()
+Sys.setenv(WEBMIDDENS_EXPIRY_SEC = 35)
+x$expire()
+x$expire(reset = TRUE)
+x$expire()
+```
+
+adfadf
+
+```{r}
+con <- crul::HttpClient$new("https://httpbin.org")
+# first request is a real HTTP request
+x$r(con$get("get", query = list(stuff = "bananas")))
+# following requests use the cached response
 x$r(con$get("get", query = list(stuff = "bananas")))
 ```
 
-list cached items
+verbose output
 
 ```{r}
-x$cache$list()
-# & cleanup
+x <- midden$new(verbose = TRUE)
+x$init(path = "rainforest")
+x$r(con$get("get", query = list(stuff = "bananas")))
+```
+
+set expiration time
+
+```{r}
+x <- midden$new()
+x$init(path = "grass")
+x$expire(3)
+x
+```
+
+Delete all the files in your "midden" (the folder with cached files)
+
+```{r}
+x$cleanup()
+```
+
+Delete the "midden" (the folder with cached files)
+
+```{r}
 x$destroy()
 ```
 
