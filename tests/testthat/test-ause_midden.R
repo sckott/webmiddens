@@ -33,8 +33,12 @@ test_that("use_midden", {
   resptime <- strptime(ztime, "%H:%M:%S", tz = "GMT")
   expect_gt(resptime, nowtime)
 
+  # webmiddens not enabled yet
+  expect_is(use_midden(some_fxn()), "list")
+
+  # FIXME: after changing to enable workflow this isn't true anymore
   # midden path not set yet
-  expect_error(use_midden(some_fxn()), "path not set")
+  # expect_error(use_midden(some_fxn()), "path not set")
   
   # FIXME: ideally test that this is a real HTTP request, not sure how
   # real http request
