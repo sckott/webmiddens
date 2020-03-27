@@ -8,3 +8,4 @@ revdep/data.sqlite
 revdep/library.noindex
 notes.R
 gettinstarted.R
+inst/ignore/*
