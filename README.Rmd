@@ -81,18 +81,31 @@ Without `webmiddens` the HTTP request happens as usual and all is good
 some_fxn()
 ```
 
-Now, with `webmiddens`:
+Now, with `webmiddens`
+
+run `wm_configuration()` first to set the path where HTTP requests will be cached
+
+```{r}
+wm_configuration("foo1")
+```
+
+```{r echo=FALSE}
+bb <- midden_current()
+bb$destroy()
+```
 
 first request is a real HTTP request
 
 ```{r}
 res1 <- use_midden(some_fxn())
+res1
 ```
 
 second request uses the cached response from the first request
 
 ```{r}
 res2 <- use_midden(some_fxn())
+res2
 ```
 
 ### the midden class

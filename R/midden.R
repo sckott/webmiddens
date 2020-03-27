@@ -109,6 +109,7 @@ midden <- R6::R6Class(
       self$cache <- cache_obj
       # set expiry
       self$expire()
+      invisible(NULL)
     },
     #' @description remove all cached files in the midden, including directory
     #' @return NULL
