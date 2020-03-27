@@ -9,7 +9,7 @@ jobs:
       env: R_CODECOV=true
     - os: linux
       r: devel
-      env: _R_CHECK_LENGTH_1_LOGIC2_=TRUE
+      env: _R_CHECK_LENGTH_1_LOGIC2_=verbose
 
 r_binary_packages:
   - covr
@@ -17,7 +17,7 @@ r_binary_packages:
 after_success:
   - if [[ "${R_CODECOV}" ]]; then R -e 'covr::codecov()'; fi
 
-r_check_args: "--as-cran"
+r_check_args: "--as-cran --no-manual --no-build-vignettes"
 
 notifications:
   email:
