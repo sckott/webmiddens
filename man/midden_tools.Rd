@@ -5,6 +5,9 @@
 \alias{midden_current}
 \alias{midden_kill}
 \alias{midden_path}
+\alias{wm_enable}
+\alias{wm_disable}
+\alias{wm_enabled}
 \title{midden_tools}
 \usage{
 midden_current()
@@ -12,6 +15,12 @@ midden_current()
 midden_kill()
 
 midden_path()
+
+wm_enable()
+
+wm_disable()
+
+wm_enabled()
 }
 \description{
 get the current midden
@@ -22,6 +31,9 @@ get the current midden
 \item \code{midden_current()}: get the current midden
 \item \code{midden_path()}: gethe current midden path
 \item \code{midden_kill()}: deletes the current midden
+\item \code{wm_enable()}: enable webmiddens
+\item \code{wm_disable()}: disable webmiddens
+\item \code{wm_enabled()}: is webmiddens endabled?
 }
 }
 

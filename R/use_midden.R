@@ -37,8 +37,12 @@
 #' (res2 <- use_midden(some_fxn(verbose = TRUE)))
 #' }}
 use_midden <- function(...) {
-  mid <- midden$new()
-  mid$init(path = midden_path())
-  res <- mid$r(...)
-  return(res)
+  if (!wm_enabled()) {
+    force(...)
+  } else {
+    mid <- midden$new()
+    mid$init(path = midden_path())
+    res <- mid$r(...)
+    return(res)
+  }
 }

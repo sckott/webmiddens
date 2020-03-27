@@ -6,6 +6,9 @@
 #' - `midden_current()`: get the current midden
 #' - `midden_path()`: gethe current midden path
 #' - `midden_kill()`: deletes the current midden
+#' - `wm_enable()`: enable webmiddens
+#' - `wm_disable()`: disable webmiddens
+#' - `wm_enabled()`: is webmiddens endabled?
 NULL
 
 #' @export
@@ -35,8 +38,24 @@ midden_kill <- function() {
 #' @rdname midden_tools
 midden_path <- function() {
   if (is.null(mdenv$path))
-    stop("midden storage path not set; see ?mid_settings")
+    stop("midden storage path not set; see ?wm_configuration")
   return(mdenv$path)
+}
+
+#' @export
+#' @rdname midden_tools
+wm_enable <- function() {
+  mdenv$turned_on <- TRUE
+}
+#' @export
+#' @rdname midden_tools
+wm_disable <- function() {
+  mdenv$turned_on <- FALSE
+}
+#' @export
+#' @rdname midden_tools
+wm_enabled <- function() {
+  mdenv$turned_on
 }
 
 webmock_cleanup = function() {

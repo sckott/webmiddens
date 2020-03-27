@@ -149,7 +149,7 @@ midden <- R6::R6Class(
     #' @param exp (integer) seconds to expire
     cache_response = function(x, exp) {
       stub <- private$make_stub(x$method, x$url,
-        x$content, x$request$headers, x$response_headers)
+        x$content, x$request$headers, x$response_headers, x$status_code)
       private$cache_stub(stub, exp)
     }
   ),
@@ -164,10 +164,10 @@ midden <- R6::R6Class(
     },
     m = function(x) if (!self$verbose) suppressMessages(x) else x,
     cleave_q = function(x) sub("\\?.+", "", x),
-    make_stub = function(method, url, body, request_headers, response_headers) {
+    make_stub = function(method, url, body, request_headers, response_headers, status_code) {
       stub <- webmockr::stub_request(method, url)
       stub <- webmockr::wi_th(stub, headers = request_headers)
-      stub <- webmockr::to_return(stub, body = body, status = 200,
+      stub <- webmockr::to_return(stub, body = body, status = status_code,
         headers = response_headers)
       stub
     },
@@ -176,9 +176,8 @@ midden <- R6::R6Class(
     },
     cache_stub = function(stub, expire = NULL, file = private$cache_file()) {
       private$m(paste0("in cache_stub - going to save to: ", file))
-      saveRDS(list(recorded = private$time(),
-        ttl = expire, stub = stub), file = file,
-        compress = TRUE)
+      saveRDS(list(recorded = private$time(), stub = stub),
+        file = file, compress = TRUE)
     },
     # clear stubs from webmockr stub registry
     clear_stubs = function() {

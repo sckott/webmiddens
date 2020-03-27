@@ -41,6 +41,7 @@ test_that("use_midden", {
   # some_fxn()
   
   # 1st request is a real one, 2nd is cached
+  wm_enable()
   wm_configuration("rainforest46")
   res1 <- use_midden(some_fxn())
   expect_false(webmockr::enabled())# webmockr should be disabled after each run
