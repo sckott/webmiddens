@@ -3,7 +3,6 @@ webmiddens
 
 
 
-
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 [![Build Status](https://travis-ci.com/ropenscilabs/webmiddens.svg?branch=master)](https://travis-ci.com/ropenscilabs/webmiddens)
 [![Build status](https://ci.appveyor.com/api/projects/status/m0rfrp3eb285bwfd?svg=true)](https://ci.appveyor.com/project/sckott/webmiddens)
@@ -36,6 +35,10 @@ we don't need users to be able to look at plain text of caches
 `2019-03-07 23:00:00`, then 1 hr from now the cache will expire, and a new real HTTP
 request will need to be made (i.e., the cache will be deleted whenever the next
 HTTP request is made)
+
+### http libraries
+
+right now we only support `crul`, but `httr` support should arrive soon
 
 ### installation
 
@@ -97,7 +100,7 @@ some_fxn()
 #> [1] "libcurl/7.64.1 r-curl/4.3 crul/0.9.2.91"
 #> 
 #> $headers$`X-Amzn-Trace-Id`
-#> [1] "Root=1-5e7e4bb5-e81a33b296017b983d5ff62e"
+#> [1] "Root=1-5e7e9427-609c99fcf96ba880177b5946"
 #> 
 #> 
 #> $origin
@@ -144,7 +147,7 @@ res1
 #> [1] "libcurl/7.64.1 r-curl/4.3 crul/0.9.2.91"
 #> 
 #> $headers$`X-Amzn-Trace-Id`
-#> [1] "Root=1-5e7e4bb5-b1df2988e9e8b1905d4b228e"
+#> [1] "Root=1-5e7e9427-0fae59facbad5688cba62304"
 #> 
 #> 
 #> $origin
@@ -177,7 +180,7 @@ res2
 #> [1] "libcurl/7.64.1 r-curl/4.3 crul/0.9.2.91"
 #> 
 #> $headers$`X-Amzn-Trace-Id`
-#> [1] "Root=1-5e7e4bb5-b1df2988e9e8b1905d4b228e"
+#> [1] "Root=1-5e7e9427-3cf7275293c69378ec9d42ee"
 #> 
 #> 
 #> $origin
@@ -254,7 +257,7 @@ x$r(con$get("get", query = list(stuff = "bananas")))
 #>     Accept: application/json, text/xml, application/xml, */*
 #>   response_headers: 
 #>     status: HTTP/2 200 
-#>     date: Fri, 27 Mar 2020 18:47:23 GMT
+#>     date: Sat, 28 Mar 2020 00:02:47 GMT
 #>     content-type: application/json
 #>     content-length: 408
 #>     server: gunicorn/19.9.0
@@ -273,7 +276,7 @@ x$r(con$get("get", query = list(stuff = "bananas")))
 #>     Accept: application/json, text/xml, application/xml, */*
 #>   response_headers: 
 #>     status: HTTP/2 200 
-#>     date: Fri, 27 Mar 2020 18:47:23 GMT
+#>     date: Sat, 28 Mar 2020 00:02:47 GMT
 #>     content-type: application/json
 #>     content-length: 408
 #>     server: gunicorn/19.9.0

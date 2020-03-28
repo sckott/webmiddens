@@ -42,6 +42,10 @@ we don't need users to be able to look at plain text of caches
 request will need to be made (i.e., the cache will be deleted whenever the next
 HTTP request is made)
 
+### http libraries
+
+right now we only support `crul`, but `httr` support should arrive soon
+
 ### installation
 
 ```{r eval=FALSE}
