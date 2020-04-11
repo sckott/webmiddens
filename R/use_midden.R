@@ -4,6 +4,7 @@
 #' @param ... a function
 #' @examples \dontrun{
 #' wm_configuration("rainforest9")
+#' midden_current()
 #' 
 #' if (requireNamespace("crul")) {
 #' some_http_request <- function(...) {
@@ -19,6 +20,7 @@
 #' some_fxn(verbose = TRUE)
 #'
 #' # use webmiddens: 1st request is a real one, 2nd is cached
+#' wm_enable()
 #' (res1 <- use_midden(some_fxn(verbose = TRUE)))
 #' (res2 <- use_midden(some_fxn(verbose = TRUE)))
 #' 
