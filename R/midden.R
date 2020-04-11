@@ -1,5 +1,3 @@
-wm_env <- new.env()
-
 #' @title midden
 #' @description web middens class
 #' @export
@@ -182,7 +180,6 @@ midden <- R6::R6Class(
         saveRDS(list(recorded = time, stub = stub),
           file = file, compress = TRUE)
       }, args = list(private$time(), stub, file))
-      wm_env$callr_save <- callr_save
       # callr_save <- callr::r_bg(function(time, stub, file) {
       #   saveRDS(list(recorded = time, stub = stub),
       #     file = file, compress = TRUE)
