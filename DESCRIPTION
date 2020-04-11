@@ -2,7 +2,7 @@ Package: webmiddens
 Title: Cache Mocked 'HTTP' Requests
 Description: Cache mocked 'HTTP' requests, leveraging 'webmockr'
     for the 'HTTP' request matching.
-Version: 0.0.3.91
+Version: 0.0.3.93
 Authors@R: c(
     person("Scott", "Chamberlain", role = c("aut", "cre"),
         email = "sckott@protonmail.com", 
@@ -19,7 +19,7 @@ Language: en-US
 Roxygen: list(markdown = TRUE)
 Imports:
     R6,
-    webmockr (>= 0.6.2.91),
+    webmockr (>= 0.6.2.92),
     hoardr
 Suggests:
     testthat,

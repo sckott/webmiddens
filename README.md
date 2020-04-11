@@ -26,7 +26,7 @@ to HTTP requests, etc.
 
 ### brainstorming
 
-- use `webmockr` to match requests (works with `crul` and `httr`, maybe `curl` soon)
+- use `webmockr` to match requests (works with `crul`; soon `httr`)
 - possibly match on, and expire based on headers: Cache-Control, Age, Last-Modified,
 ETag, Expires (see Ruby's faraday-http-cache (https://github.com/plataformatec/faraday-http-cache#what-gets-cached))
 - caching backends: probably all binary to save disk space since most likely
@@ -97,10 +97,10 @@ some_fxn()
 #> [1] "httpbin.org"
 #> 
 #> $headers$`User-Agent`
-#> [1] "libcurl/7.64.1 r-curl/4.3 crul/0.9.2.91"
+#> [1] "libcurl/7.64.1 r-curl/4.3 crul/0.9.0"
 #> 
 #> $headers$`X-Amzn-Trace-Id`
-#> [1] "Root=1-5e7e9427-609c99fcf96ba880177b5946"
+#> [1] "Root=1-5e910f9e-8b7e2045c874049f716afdd9"
 #> 
 #> 
 #> $origin
@@ -144,10 +144,10 @@ res1
 #> [1] "httpbin.org"
 #> 
 #> $headers$`User-Agent`
-#> [1] "libcurl/7.64.1 r-curl/4.3 crul/0.9.2.91"
+#> [1] "libcurl/7.64.1 r-curl/4.3 crul/0.9.0"
 #> 
 #> $headers$`X-Amzn-Trace-Id`
-#> [1] "Root=1-5e7e9427-0fae59facbad5688cba62304"
+#> [1] "Root=1-5e910f9e-d0d24f3bba1bc122d0ffd3bd"
 #> 
 #> 
 #> $origin
@@ -177,10 +177,10 @@ res2
 #> [1] "httpbin.org"
 #> 
 #> $headers$`User-Agent`
-#> [1] "libcurl/7.64.1 r-curl/4.3 crul/0.9.2.91"
+#> [1] "libcurl/7.64.1 r-curl/4.3 crul/0.9.0"
 #> 
 #> $headers$`X-Amzn-Trace-Id`
-#> [1] "Root=1-5e7e9427-3cf7275293c69378ec9d42ee"
+#> [1] "Root=1-5e910f9e-2f3ff179e34bc89324495e48"
 #> 
 #> 
 #> $origin
@@ -242,49 +242,16 @@ x$expire()
 #> NULL
 ```
 
-adfadf
+FIXME: The below not working right now - figure out why
 
 
 ```r
+wm_enable()
 con <- crul::HttpClient$new("https://httpbin.org")
 # first request is a real HTTP request
 x$r(con$get("get", query = list(stuff = "bananas")))
-#> <crul response> 
-#>   url: https://httpbin.org/get?stuff=bananas
-#>   request_headers: 
-#>     User-Agent: libcurl/7.64.1 r-curl/4.3 crul/0.9.2.91
-#>     Accept-Encoding: gzip, deflate
-#>     Accept: application/json, text/xml, application/xml, */*
-#>   response_headers: 
-#>     status: HTTP/2 200 
-#>     date: Sat, 28 Mar 2020 00:02:47 GMT
-#>     content-type: application/json
-#>     content-length: 408
-#>     server: gunicorn/19.9.0
-#>     access-control-allow-origin: *
-#>     access-control-allow-credentials: true
-#>   params: 
-#>     stuff: bananas
-#>   status: 200
 # following requests use the cached response
 x$r(con$get("get", query = list(stuff = "bananas")))
-#> <crul response> 
-#>   url: https://httpbin.org/get?stuff=bananas
-#>   request_headers: 
-#>     User-Agent: libcurl/7.64.1 r-curl/4.3 crul/0.9.2.91
-#>     Accept-Encoding: gzip, deflate
-#>     Accept: application/json, text/xml, application/xml, */*
-#>   response_headers: 
-#>     status: HTTP/2 200 
-#>     date: Sat, 28 Mar 2020 00:02:47 GMT
-#>     content-type: application/json
-#>     content-length: 408
-#>     server: gunicorn/19.9.0
-#>     access-control-allow-origin: *
-#>     access-control-allow-credentials: true
-#>   params: 
-#>     stuff: bananas
-#>   status: 200
 ```
 
 verbose output
@@ -294,27 +261,6 @@ verbose output
 x <- midden$new(verbose = TRUE)
 x$init(path = "rainforest")
 x$r(con$get("get", query = list(stuff = "bananas")))
-#> CrulAdapter enabled!
-#> HttrAdapter enabled!
-#> net connect allowed
-#> 1 stubs loaded
-#> <crul response> 
-#>   url: https://httpbin.org/get?stuff=bananas
-#>   request_headers: 
-#>     User-Agent: libcurl/7.64.1 r-curl/4.3 crul/0.9.2.91
-#>     Accept-Encoding: gzip, deflate
-#>     Accept: application/json, text/xml, application/xml, */*
-#>   response_headers: 
-#>     status: HTTP/2 200 
-#>     date: Fri, 27 Mar 2020 18:47:24 GMT
-#>     content-type: application/json
-#>     content-length: 408
-#>     server: gunicorn/19.9.0
-#>     access-control-allow-origin: *
-#>     access-control-allow-credentials: true
-#>   params: 
-#>     stuff: bananas
-#>   status: 200
 ```
 
 set expiration time
@@ -324,11 +270,7 @@ set expiration time
 x <- midden$new()
 x$init(path = "grass")
 x$expire(3)
-#> [1] 3
 x
-#> <midden> 
-#>   path: /Users/sckott/Library/Caches/R/grass
-#>   expiry (sec): 3
 ```
 
 Delete all the files in your "midden" (the folder with cached files)
@@ -336,7 +278,6 @@ Delete all the files in your "midden" (the folder with cached files)
 
 ```r
 x$cleanup()
-#> no files found
 ```
 
 Delete the "midden" (the folder with cached files)
