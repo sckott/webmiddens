@@ -20,7 +20,8 @@ Roxygen: list(markdown = TRUE)
 Imports:
     R6,
     webmockr (>= 0.6.2.92),
-    hoardr
+    hoardr,
+    callr
 Suggests:
     testthat,
     jsonlite,

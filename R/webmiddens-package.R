@@ -6,6 +6,7 @@
 #' disable enable webmockr_allow_net_connect webmockr_disable_net_connect
 #' stub_request wi_th to_return stub_registry_clear stub_registry
 #' @importFrom hoardr hoard
+#' @importFrom callr r_bg
 #' @aliases webmiddens
 #' @docType package
 #' @keywords package

@@ -1,3 +1,5 @@
+wm_env <- new.env()
+
 #' @title midden
 #' @description web middens class
 #' @export
@@ -176,8 +178,17 @@ midden <- R6::R6Class(
     },
     cache_stub = function(stub, expire = NULL, file = private$cache_file()) {
       private$m(paste0("in cache_stub - going to save to: ", file))
-      saveRDS(list(recorded = private$time(), stub = stub),
-        file = file, compress = TRUE)
+      callr_save <- callr::r_bg(function(time, stub, file) {
+        saveRDS(list(recorded = time, stub = stub),
+          file = file, compress = TRUE)
+      }, args = list(private$time(), stub, file))
+      wm_env$callr_save <- callr_save
+      # callr_save <- callr::r_bg(function(time, stub, file) {
+      #   saveRDS(list(recorded = time, stub = stub),
+      #     file = file, compress = TRUE)
+      # }, args = list(time(), stub, file))
+      # saveRDS(list(recorded = private$time(), stub = stub),
+      #   file = file, compress = TRUE)
     },
     # clear stubs from webmockr stub registry
     clear_stubs = function() {
