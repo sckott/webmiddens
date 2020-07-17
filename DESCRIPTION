@@ -27,7 +27,7 @@ Suggests:
     jsonlite,
     crul
 Remotes: ropensci/webmockr@middens
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 X-schema.org-applicationCategory: Web
 X-schema.org-keywords: http, https, API, curl, mock, mocking, fakeweb, http-mocking, testing, testing-tools, tdd
 X-schema.org-isPartOf: https://ropensci.org
