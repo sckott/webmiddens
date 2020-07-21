@@ -11,7 +11,7 @@ jobs:
       r: devel
       env: _R_CHECK_LENGTH_1_LOGIC2_=verbose
 
-r_binary_packages:
+r_packages:
   - covr
 
 r_github_packages:
