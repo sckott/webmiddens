@@ -4,6 +4,7 @@ webmiddens
 
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![R-CMD-check](https://github.com/sckott/webmiddens/workflows/R-CMD-check/badge.svg)](https://github.com/sckott/webmiddens/actions?query=workflow%3AR-CMD-check)
 [![codecov](https://codecov.io/gh/sckott/webmiddens/branch/master/graph/badge.svg)](https://codecov.io/gh/sckott/webmiddens)
 
 simple caching of HTTP requests/responses, hooking into webmockr (https://github.com/ropensci/webmockr)
