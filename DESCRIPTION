@@ -2,17 +2,16 @@ Package: webmiddens
 Title: Cache Mocked 'HTTP' Requests
 Description: Cache mocked 'HTTP' requests, leveraging 'webmockr'
     for the 'HTTP' request matching.
-Version: 0.0.3.93
+Version: 0.0.4.91
 Authors@R: c(
     person("Scott", "Chamberlain", role = c("aut", "cre"),
-        email = "sckott@protonmail.com", 
-        comment = c(ORCID="0000-0003-1444-9135")),
-    person("rOpenSci", role = "fnd", comment = "https://ropensci.org")
+        email = "myrmecocystus@gmail.com", 
+        comment = c(ORCID="0000-0003-1444-9135"))
     )
 License: MIT + file LICENSE
-URL: https://github.com/ropensci/webmiddens (devel)
-    https://docs.ropensci.org/webmiddens/ (docs)
-BugReports: https://github.com/ropensci/webmiddens/issues
+URL: https://github.com/sckott/webmiddens (devel)
+    https://sckott.github.io/webmiddens/ (docs)
+BugReports: https://github.com/sckott/webmiddens/issues
 LazyData: true
 Encoding: UTF-8
 Language: en-US
@@ -30,4 +29,3 @@ Remotes: ropensci/webmockr@middens
 RoxygenNote: 7.1.1
 X-schema.org-applicationCategory: Web
 X-schema.org-keywords: http, https, API, curl, mock, mocking, fakeweb, http-mocking, testing, testing-tools, tdd
-X-schema.org-isPartOf: https://ropensci.org

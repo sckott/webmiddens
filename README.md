@@ -4,9 +4,7 @@ webmiddens
 
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![Build Status](https://travis-ci.com/ropensci/webmiddens.svg?branch=master)](https://travis-ci.com/ropensci/webmiddens)
-[![Build status](https://ci.appveyor.com/api/projects/status/m0rfrp3eb285bwfd?svg=true)](https://ci.appveyor.com/project/sckott/webmiddens)
-[![codecov](https://codecov.io/gh/ropensci/webmiddens/branch/master/graph/badge.svg)](https://codecov.io/gh/ropensci/webmiddens)
+[![codecov](https://codecov.io/gh/sckott/webmiddens/branch/master/graph/badge.svg)](https://codecov.io/gh/sckott/webmiddens)
 
 simple caching of HTTP requests/responses, hooking into webmockr (https://github.com/ropensci/webmockr)
 for the HTTP request matching
@@ -44,7 +42,7 @@ right now we only support `crul`, but `httr` support should arrive soon
 
 
 ```r
-remotes::install_github("ropensci/webmiddens")
+remotes::install_github("sckott/webmiddens")
 ```
 
 ### use_midden()
@@ -97,10 +95,10 @@ some_fxn()
 #> [1] "httpbin.org"
 #> 
 #> $headers$`User-Agent`
-#> [1] "libcurl/7.64.1 r-curl/4.3 crul/0.9.0"
+#> [1] "libcurl/7.74.0 r-curl/4.3 crul/1.0.2.92"
 #> 
 #> $headers$`X-Amzn-Trace-Id`
-#> [1] "Root=1-5e910f9e-8b7e2045c874049f716afdd9"
+#> [1] "Root=1-5fd29de8-0e978093689e02246d0b3d92"
 #> 
 #> 
 #> $origin
@@ -144,10 +142,10 @@ res1
 #> [1] "httpbin.org"
 #> 
 #> $headers$`User-Agent`
-#> [1] "libcurl/7.64.1 r-curl/4.3 crul/0.9.0"
+#> [1] "libcurl/7.74.0 r-curl/4.3 crul/1.0.2.92"
 #> 
 #> $headers$`X-Amzn-Trace-Id`
-#> [1] "Root=1-5e910f9e-d0d24f3bba1bc122d0ffd3bd"
+#> [1] "Root=1-5fd29de8-3ad69a2f59e45afc48446e85"
 #> 
 #> 
 #> $origin
@@ -177,10 +175,10 @@ res2
 #> [1] "httpbin.org"
 #> 
 #> $headers$`User-Agent`
-#> [1] "libcurl/7.64.1 r-curl/4.3 crul/0.9.0"
+#> [1] "libcurl/7.74.0 r-curl/4.3 crul/1.0.2.92"
 #> 
 #> $headers$`X-Amzn-Trace-Id`
-#> [1] "Root=1-5e910f9e-2f3ff179e34bc89324495e48"
+#> [1] "Root=1-5fd29de8-65506d0055d8b5c874949851"
 #> 
 #> 
 #> $origin
@@ -289,12 +287,10 @@ x$destroy()
 
 ## Meta
 
-* Please [report any issues or bugs](https://github.com/ropensci/webmiddens/issues).
+* Please [report any issues or bugs](https://github.com/sckott/webmiddens/issues).
 * License: MIT
 * Get citation information for `webmiddens` in R doing `citation(package = 'webmiddens')`
 * Please note that this project is released with a [Contributor Code of Conduct][coc].
 By participating in this project you agree to abide by its terms.
 
-[![ropensci_footer](https://ropensci.org/public_images/github_footer.png)](https://ropensci.org)
-
-[coc]: https://github.com/ropensci/webmiddens/blob/master/CODE_OF_CONDUCT.md
+[coc]: https://github.com/sckott/webmiddens/blob/master/CODE_OF_CONDUCT.md

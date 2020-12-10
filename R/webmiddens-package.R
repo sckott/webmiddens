@@ -10,5 +10,5 @@
 #' @aliases webmiddens
 #' @docType package
 #' @keywords package
-#' @author Scott Chamberlain \email{sckott@@protonmail.com}
+#' @author Scott Chamberlain
 NULL

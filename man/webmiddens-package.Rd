@@ -9,6 +9,6 @@
 Cache mocked HTTP requests
 }
 \author{
-Scott Chamberlain \email{sckott@protonmail.com}
+Scott Chamberlain
 }
 \keyword{package}
